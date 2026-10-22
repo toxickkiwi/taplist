@@ -53,11 +53,12 @@
     grid-template-columns: auto auto minmax(0, 1fr) auto;
     padding: .5rem .8rem; border: .25rem solid transparent; border-radius: .8rem;
   }
-  .num { min-width: 4.4rem; text-align: center; font-family: Montserrat, Arial, sans-serif; font-weight: 900; font-size: 3.4rem; line-height: 1; color: var(--section); font-variant-numeric: tabular-nums; }
-  .no-num .num { display: none; }
+  .num { display: flex; flex-direction: column; align-items: center; min-width: 4.4rem; text-align: center; font-family: Montserrat, Arial, sans-serif; font-weight: 900; font-size: 3.4rem; line-height: 1; color: var(--section); font-variant-numeric: tabular-nums; }
+  .no-num .num b { display: none; }
+  .no-num .num { min-width: 0; }
 
-  .media { position: relative; width: 6.4rem; height: 6.4rem; flex: none; }
-  .media img, .media .glass { width: 100%; height: 100%; }
+  .media { position: relative; width: 6.4rem; flex: none; }
+  .media img, .media .glass { width: 6.4rem; height: 6.4rem; }
   .media img { display: block; }
   .media .glass { display: none; }
 
@@ -69,9 +70,8 @@
   .img-glass .media img { display: none; }
   .img-glass .media .glass { display: block; }
   /* 4) без картинок */
-  .img-none .tap { grid-template-columns: auto 0 minmax(0, 1fr) auto; }
-  .no-num.img-none .tap { grid-template-columns: auto minmax(0, 1fr) auto; }
-  .no-num:not(.img-none) .tap { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .img-none .media { display: none; }
+  .img-none .tap { grid-template-columns: auto minmax(0, 1fr) auto; }
 
   .info { min-width: 0; }
   .tap h3 { margin: 0; font-size: 2.1rem; font-weight: 700; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
@@ -102,23 +102,13 @@
   .tag.promo { --tc: var(--t-promo); --tfg: #1a1300; }
   .tag.top   { --tc: var(--t-top); }
   .tag.zero  { --tc: var(--zero); --tfg: #04263a; }
-  /* метки на фото; без картинок — у номера */
-  .ribbon { position: absolute; inset: 0; pointer-events: none; }
-
-  /* вариант «ленточка»: наискосок через угол картинки */
-  .tags-ribbon .ribbon { overflow: hidden; border-radius: .6rem; }
-  .tags-ribbon .ribbon .tag { position: absolute; top: 1.2rem; left: -2.8rem; width: 11rem; justify-content: center; transform: rotate(-45deg); border-radius: 0; padding: .25rem 0; font-size: 1.3rem; box-shadow: 0 .2rem .5rem rgba(0,0,0,.4); }
-
-  /* вариант «наклейка»: плашка внизу фото, чуть выходит за край */
-  .tags-sticker .ribbon .tag { position: absolute; left: 50%; bottom: -.7rem; transform: translateX(-50%); font-size: 1.2rem; padding: .2rem .55rem; box-shadow: 0 .2rem .5rem rgba(0,0,0,.45); }
-
-  /* без картинок метка садится под номер */
-  .img-none .media { display: block; width: 0; height: auto; align-self: stretch; }
-  .img-none .media img, .img-none .media .glass { display: none; }
-  .img-none .ribbon { inset: auto auto 0 -4.6rem; overflow: visible; }
-  .no-num.img-none .media { width: auto; align-self: center; }
-  .no-num.img-none .ribbon { position: static; }
-  .img-none .ribbon .tag { position: static; transform: none; width: auto; font-size: 1rem; padding: .15rem .4rem; border-radius: .4rem; }
+  /* Метки никогда не перекрывают картинку: под фото или под номером. */
+  .num .tag, .photo-tag { display: none; }
+  .tags-photo .photo-tag { display: flex; justify-content: center; margin-top: .4rem; }
+  .tags-num .num .tag, .img-none .num .tag { display: inline-flex; }
+  .img-none .photo-tag { display: none; }
+  .num .tag { margin-top: .4rem; }
+  .photo-tag .tag, .num .tag { font-size: 1.15rem; padding: .2rem .5rem; }
 
   /* ---------- панель настроек (на ТВ прячется сама) ---------- */
   .gear {
@@ -174,8 +164,8 @@
   </div>
   <h4>Метки</h4>
   <div class="opts" data-key="tags">
-    <label><input type="radio" name="tags" value="ribbon"><span>Ленточка в углу фото</span></label>
-    <label><input type="radio" name="tags" value="sticker"><span>Наклейка внизу фото</span></label>
+    <label><input type="radio" name="tags" value="photo"><span>Под фото</span></label>
+    <label><input type="radio" name="tags" value="num"><span>Под номером</span></label>
   </div>
   <h4>Фон</h4>
   <div class="opts" data-key="theme">
@@ -188,12 +178,12 @@
 <script>
 // Цвет шапки отдела и цвет текста на ней.
 const SECTIONS = [
-  { id: "light",      title: "Светлое фильтрованное",   color: "#f5c518", fg: "#1a1300", lane: 0 },
-  { id: "wheat",      title: "Пшеничное",               color: "#ffe17a", fg: "#1a1300", lane: 0 },
-  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#ff7a1a", fg: "#1a0b00", lane: 0 },
-  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#e9b949", fg: "#1a1300", lane: 1 },
-  { id: "dark",       title: "Тёмное",                  color: "#9b3d22", fg: "#fff",    lane: 1 },
-  { id: "other",      title: "Не пиво",                 color: "#e0436b", fg: "#fff",    lane: 1 },
+  { id: "light",      title: "Светлое фильтрованное",   color: "#c99a2e", fg: "#fff", lane: 0 },
+  { id: "wheat",      title: "Пшеничное",               color: "#4f7cc4", fg: "#fff", lane: 0 },
+  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#5e9a45", fg: "#fff", lane: 0 },
+  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#2f9488", fg: "#fff", lane: 1 },
+  { id: "dark",       title: "Тёмное",                  color: "#94456b", fg: "#fff", lane: 1 },
+  { id: "other",      title: "Не пиво",                 color: "#7a62c2", fg: "#fff", lane: 1 },
 ];
 
 // Метки, которые есть в админке: Zero, New, %, 1.5=2, Top.
@@ -270,13 +260,13 @@ function tapHtml(t, num) {
   const isZero = abv === 0;
   const tagKey = tag || (isZero ? "ZERO" : null);
   const tagDef = tagKey && TAGS[tagKey];
-  const ribbonHtml = tagDef ? `<div class="ribbon"><span class="tag ${tagDef.cls}">${esc(tagDef.short)}</span></div>` : "";
+  const tagHtml = tagDef ? `<span class="tag ${tagDef.cls}">${esc(tagDef.short)}</span>` : "";
   return `<article class="tap${isRg ? " rg" : ""}${isZero ? " zero" : ""}">
-    <div class="num">${num}</div>
+    <div class="num"><b>${num}</b>${tagHtml}</div>
     <div class="media">
       <img src="https://assets.untappd.com/site/beer_logos/${img}.jpeg" alt="" loading="lazy">
       ${glass(beerColor(section, style))}
-      ${ribbonHtml}
+      ${tagHtml ? `<div class="photo-tag">${tagHtml}</div>` : ""}
     </div>
     <div class="info">
       <h3>${isRg ? `<span class="rg-mark">RGB</span>` : ""}${esc(name)}</h3>
@@ -326,10 +316,10 @@ function fit() {
 }
 
 // Настройки вида
-const DEFAULTS = { num: "dept", img: "tile", rg: "fill", tags: "ribbon", theme: "dark" };
+const DEFAULTS = { num: "dept", img: "tile", rg: "fill", tags: "photo", theme: "dark" };
 let settings = { ...DEFAULTS };
 try { Object.assign(settings, JSON.parse(localStorage.getItem("taplist-settings") || "{}")); } catch (e) {}
-if (!["ribbon", "sticker"].includes(settings.tags)) settings.tags = DEFAULTS.tags;
+if (!["photo", "num"].includes(settings.tags)) settings.tags = DEFAULTS.tags;
 
 function apply() {
   app.className = [
