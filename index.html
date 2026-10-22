@@ -155,6 +155,11 @@
 
 <button class="gear" id="gear" type="button" aria-label="Настройки вида" aria-expanded="false">⚙</button>
 <form class="panel" id="panel" hidden>
+  <h4>Порядок в категории</h4>
+  <div class="opts" data-key="order">
+    <label><input type="radio" name="order" value="zero-rgb"><span>Нулёвки → RGB → остальные</span></label>
+    <label><input type="radio" name="order" value="admin"><span>Как в админке</span></label>
+  </div>
   <h4>Нумерация</h4>
   <div class="opts" data-key="num">
     <label><input type="radio" name="num" value="dept"><span>По отделам</span></label>
@@ -309,11 +314,21 @@ const app = document.getElementById("app");
 const lanes = [document.createElement("div"), document.createElement("div")];
 lanes.forEach(l => { l.className = "lane"; document.getElementById("lanes").appendChild(l); });
 
-function render(numbering) {
+// Порядок внутри категории: сначала нулёвки, потом Robim Good подряд, потом остальные.
+// Внутри каждой группы — порядок кранов из админки.
+const isZero = t => t[5] === 0;
+const isRgb = t => /^Robim Good/i.test(t[2]);
+const rank = t => isZero(t) ? 0 : isRgb(t) ? 1 : 2;
+function sortTaps(taps, order) {
+  if (order === "admin") return taps;
+  return taps.map((t, i) => [t, i]).sort((a, b) => rank(a[0]) - rank(b[0]) || a[1] - b[1]).map(([t]) => t);
+}
+
+function render(numbering, order) {
   lanes.forEach(l => { l.innerHTML = ""; });
   let total = 0;
   for (const s of SECTIONS) {
-    const taps = TAPS.filter(t => t[0] === s.id);
+    const taps = sortTaps(TAPS.filter(t => t[0] === s.id), order);
     const items = taps.map((t, i) => tapHtml(t, numbering === "all" ? ++total : i + 1)).join("");
     lanes[s.lane].insertAdjacentHTML("beforeend",
       `<section class="section${s.pale ? " pale" : ""}" style="--section:${s.color}; --grow:${Math.ceil(taps.length / 2) + 0.8}">
@@ -337,7 +352,7 @@ function fit() {
 }
 
 // Настройки вида
-const DEFAULTS = { num: "dept", img: "tile", rg: "fill", tags: "photo", hdr: "brand", theme: "dark" };
+const DEFAULTS = { order: "zero-rgb", num: "dept", img: "tile", rg: "fill", tags: "photo", hdr: "brand", theme: "dark" };
 let settings = { ...DEFAULTS };
 try { Object.assign(settings, JSON.parse(localStorage.getItem("taplist-settings") || "{}")); } catch (e) {}
 if (!["photo", "num"].includes(settings.tags)) settings.tags = DEFAULTS.tags;
@@ -351,7 +366,7 @@ function apply() {
     settings.theme === "light" ? "light" : "",
     settings.hdr === "bar" ? "hdr-bar" : "",
   ].join(" ");
-  render(settings.num);
+  render(settings.num, settings.order);
   fit();
 }
 
