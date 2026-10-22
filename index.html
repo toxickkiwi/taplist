@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taplist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;800&family=Caveat:wght@600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --accent: #e8a317;
+    --per-row: 2;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font-family: Inter, system-ui, sans-serif; min-height: 100vh; }
+
+  /* ---------- переключатель вариантов ---------- */
+  .switcher {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    padding: 10px 16px;
+    background: #111; color: #eee; font-size: 14px;
+    border-bottom: 1px solid #333;
+  }
+  .switcher b { margin-right: 4px; }
+  .switcher button {
+    font: inherit; cursor: pointer;
+    padding: 6px 12px; border-radius: 999px;
+    border: 1px solid #444; background: #222; color: #eee;
+  }
+  .switcher button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #111; font-weight: 600; }
+  .switcher label { margin-left: auto; display: flex; gap: 6px; align-items: center; }
+
+  /* ---------- общая раскладка ---------- */
+  .board { padding: 24px; }
+  .lanes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
+  .lane { display: flex; flex-direction: column; gap: 24px; }
+  .section h2 { margin: 0 0 12px; }
+  .list { display: grid; grid-template-columns: repeat(var(--per-row), minmax(0, 1fr)); gap: 10px; }
+
+  .tap { position: relative; display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; }
+  .tap img { width: 64px; height: 64px; object-fit: contain; display: block; }
+  .tap h3 { margin: 0; font-size: 17px; line-height: 1.15; }
+  .brewery { margin: 3px 0 5px; font-size: 13px; opacity: .8; }
+  .stats { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; }
+  .stats .abv, .stats .ibu { font-weight: 600; white-space: nowrap; }
+  .prices { display: flex; flex-direction: column; gap: 4px; text-align: right; font-size: 13px; white-space: nowrap; }
+  .prices strong { font-size: 18px; margin-left: 6px; }
+  .badge { position: absolute; left: 6px; bottom: 6px; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--accent); color: #111; }
+
+  @media (max-width: 1100px) { .lanes { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    .board { padding: 16px; }
+    .list { grid-template-columns: 1fr; }
+  }
+
+  /* ========== 1. Оригинал (приблизительно как сейчас) ========== */
+  .v-original { background: #141414; color: #f3efe6; }
+  .v-original .section h2 { font-family: Oswald, sans-serif; text-transform: uppercase; letter-spacing: .04em; font-size: 22px; color: var(--section); border-bottom: 3px solid var(--section); padding-bottom: 6px; }
+  .v-original .tap { background: #1f1f1f; border-radius: 10px; border-left: 4px solid var(--section); }
+  .v-original .prices strong { color: var(--accent); }
+
+  /* ========== 2. Меловая доска ========== */
+  .v-chalk { background: #232a26 radial-gradient(circle at 30% 20%, #2d3631 0, #1c221f 70%); color: #f2f0e8; }
+  .v-chalk .section h2 { font-family: Caveat, cursive; font-size: 38px; font-weight: 700; color: var(--section); }
+  .v-chalk .section h2::after { content: ""; display: block; height: 2px; margin-top: 2px; background: repeating-linear-gradient(90deg, currentColor 0 14px, transparent 14px 20px); opacity: .6; }
+  .v-chalk .tap { border-bottom: 1px dashed rgba(255,255,255,.18); padding-left: 0; padding-right: 0; }
+  .v-chalk .tap img { border-radius: 50%; background: #fff; padding: 4px; }
+  .v-chalk .tap h3 { font-family: Caveat, cursive; font-size: 26px; font-weight: 700; }
+  .v-chalk .prices strong { font-family: Caveat, cursive; font-size: 26px; color: #ffe59a; }
+  .v-chalk .badge { background: #ffe59a; transform: rotate(-6deg); }
+
+  /* ========== 3. Светлое меню ========== */
+  .v-paper { background: #f6f1e7; color: #2a2420; }
+  .v-paper .switcher { background: #2a2420; }
+  .v-paper .section { background: #fffdf8; border: 1px solid #e3d9c6; border-radius: 4px; padding: 18px 20px; }
+  .v-paper .section h2 { font-family: "Playfair Display", serif; font-weight: 900; font-size: 28px; display: flex; align-items: center; gap: 10px; }
+  .v-paper .section h2::before { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--section); flex: none; }
+  .v-paper .list { gap: 0 24px; }
+  .v-paper .tap { grid-template-columns: 1fr auto; padding: 10px 0; border-bottom: 1px solid #eee3cf; }
+  .v-paper .tap img { display: none; }
+  .v-paper .tap h3 { font-family: "Playfair Display", serif; font-size: 19px; }
+  .v-paper .brewery { color: #7a6a58; opacity: 1; }
+  .v-paper .stats .abv { color: #b5651d; }
+  .v-paper .badge { position: static; display: inline-block; margin-left: 6px; vertical-align: middle; background: #2a2420; color: #fff; }
+
+  /* ========== 4. Яркие карточки ========== */
+  .v-cards { background: #0d0f14; color: #fff; }
+  .v-cards .section h2 { display: inline-block; font-family: Oswald, sans-serif; text-transform: uppercase; font-size: 20px; padding: 6px 16px; border-radius: 999px; background: var(--section); color: #111; }
+  .v-cards .tap { background: linear-gradient(135deg, color-mix(in srgb, var(--section) 22%, #161a22), #161a22 60%); border: 1px solid color-mix(in srgb, var(--section) 40%, transparent); border-radius: 16px; }
+  .v-cards .tap img { border-radius: 12px; background: #fff; }
+  .v-cards .tap h3 { font-weight: 800; }
+  .v-cards .stats span { background: rgba(255,255,255,.08); padding: 2px 8px; border-radius: 999px; }
+  .v-cards .prices strong { color: var(--section); font-size: 20px; }
+  .v-cards .badge { left: auto; right: 10px; top: -8px; bottom: auto; background: #ff3d6e; color: #fff; }
+</style>
+</head>
+<body class="v-original">
+
+<div class="switcher" role="toolbar" aria-label="Вариант дизайна">
+  <b>Вариант:</b>
+  <button data-v="v-original">1. Как сейчас</button>
+  <button data-v="v-chalk">2. Меловая доска</button>
+  <button data-v="v-paper">3. Светлое меню</button>
+  <button data-v="v-cards">4. Яркие карточки</button>
+  <label>В ряд:
+    <select id="perRow"><option>1</option><option selected>2</option><option>3</option></select>
+  </label>
+</div>
+
+<main class="board"><div class="lanes" id="lanes"></div></main>
+
+<script>
+// Данные вытащены из страницы taplist (venue 28). Цены — в рублях.
+const SECTIONS = [
+  { id: "light",      title: "Светлое фильтрованное",   color: "#d7a742", lane: 0 },
+  { id: "wheat",      title: "Пшеничное",               color: "#f0d270", lane: 0 },
+  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#df7b32", lane: 0 },
+  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#c8ad68", lane: 1 },
+  { id: "dark",       title: "Тёмное",                  color: "#a56a4a", lane: 1 },
+  { id: "other",      title: "Не пиво",                 color: "#b94343", lane: 1 },
+];
+
+// [секция, название, пивоварня, страна, стиль, ABV, IBU, цена 0,5, цена 1 л, картинка, бейдж]
+const TAPS = [
+  ["light", "Grimbergen Blonde", "Alken-Maes", "FR", "Belgian Blonde", 6.7, 22, 8, 8, "beer-2_e6322_sm", "1.5=2"],
+  ["light", "Krušovice 10 / Královské Světlé", "Heineken", "RU", "Lager - Světlé (Czech Pale)", 4.2, 23, 8, 8, "beer-23585_cc122_sm"],
+  ["light", "Robim Good ZERO", "Robim Good Brewery", "BY", "Non-Alcoholic - Lager", 0, 20, 8, 8, "beer-6772340_d9f07_sm"],
+  ["light", "Robim Good NORD", "Robim Good Brewery", "BY", "Pilsner - Czech / Bohemian", 4.8, 30, 8, 8, "beer-6752580_81765_sm"],
+  ["unfiltered", "Beaver Леденцовое (Ledentsovoe)", "BEAVER (Пивоваренная компания БИВЕР)", "BY", "Lager - Pale", 5.2, null, 8, 8, "beer-3512093_fe17b_sm", "NEW"],
+  ["unfiltered", "FAVORITE EURO LAGER", "BEAVER (Пивоваренная компания БИВЕР)", "BY", "Lager - Pale", 4.7, null, 9, 9, "beer-271865_e9e41_sm"],
+  ["unfiltered", "Robim Good SVEZAK", "Robim Good Brewery", "BY", "Lager - Světlé (Czech Pale)", 4.6, 13, 8, 8, "beer-3781653_d973a_sm"],
+  ["unfiltered", "Robim Good OKTOBERFEST", "Robim Good Brewery", "BY", "Festbier", 6, 20, 8, 8, "beer-6868970_3ceeb_sm"],
+  ["wheat", "Kronenbourg 1664 Blanc", "Brasseries Kronenbourg", "BY", "Wheat Beer - Witbier / Blanche", 5, 7, 8, 8, "beer-5999_bbc68_sm"],
+  ["wheat", "Edelweiss Weizenbier", "Brau Union Österreich", "RU", "Wheat Beer - Hefeweizen", 5.3, null, 8, 8, "beer-3916373_a8fe9_sm"],
+  ["wheat", "Edelweiss Snowfresh", "Brau Union Österreich", "RU", "Wheat Beer - Hefeweizen", 4.9, null, 9, 9, "beer-EdelweissSnowfresh_14622"],
+  ["wheat", "Robim Good WAKE UP", "Robim Good Brewery", "BY", "Bock - Weizenbock", 6.5, 8, 8, 8, "beer-4091677_839df_sm"],
+  ["dark", "1915", "Brewlok Brewery", "BY", "Stout - Other", 5.5, null, 8, 8, "beer-1214575_ec740_sm"],
+  ["dark", "Веневитинская Дева", "Brewlok Brewery", "RU", "IPA - Black / Cascadian Dark Ale", 6, 70, 8, 8, "beer-1434483_ce7d8_sm"],
+  ["dark", "Robim Good AMBER RAY", "Robim Good", "BY", "Lager - Amber / Red", 5.2, 9, 8, 8, "beer-3876307_8c9f0_sm"],
+  ["dark", "Stoutopia", "Black Cat Brewery", "RU", "Stout - Milk / Sweet", 6.7, null, 9, 9, "beer-6400274_66007_sm"],
+  ["dark", "Кощей", "Brewlok", "RU", "Stout - Coffee", 6.9, null, 9, 9, "beer-1731404_08e92_sm"],
+  ["dark", "Pastry Worldwide: Chocolate, Cinnamon And Carob Syrup", "Black Cat Brewery", "RU", "Stout - Imperial / Double Pastry", 12.1, 7, 8, 8, "beer-6504522_b327d_sm"],
+  ["dark", "Robim Good SUBSTANCE", "Robim Good Brewery", "BY", "Stout - Irish Dry", 6.4, 10, 8, 8, "beer-6057948_4bde2_sm"],
+  ["craft", "70", "Black Cat Brewery", "RU", "IPA - American", 6.6, 70, 8, 8, "beer-1070427_c6c65_sm"],
+  ["craft", "Moscow Calling", "Black Cat Brewery", "BY", "Bitter - Best", 4.7, 30, 8, 8, "beer-5230956_29177_sm"],
+  ["craft", "Street Code", "Black Cat Brewery", "RU", "Sour - Fruited", 6.5, null, 8, 8, "beer-6455202_09956_sm"],
+  ["craft", "Лихо Одноглазое", "Brewlok Brewery", "RU", "DIPA", 6.9, 120, 8, 8, "beer-1802346_97680_sm"],
+  ["craft", "Офицер Дуфи", "Duble", "RU", "Sour - Smoothie / Pastry", 6.2, 9, 8, 8, "beer-6647293_d0807_sm"],
+  ["craft", "СОБАКА СУТУЛАЯ", "Hops Brewery", "BY", "IPA - New England / Hazy", 6.3, 20, 8, 8, "beer-6860662_a3d13_sm"],
+  ["craft", "СОЛО КОТ Цитра", "Black Cat Brewery", "BY", "IPA - American", 6.9, 68, 9, 9, "beer-6716775_f95ea_sm"],
+  ["craft", "Caramba", "Brewlok Brewery", "BY", "IPA - Milkshake", 6.9, 40, 9, 9, "beer-2654974_2c914_sm"],
+  ["craft", "Волчий Пастырь", "Brewlok Brewery", "RU", "IPA - Triple", 6.9, 105, 9, 9, "beer-2321101_aaac3_sm"],
+  ["craft", "WET CAT", "Black Cat Brewery", "RU", "Sour - Fruited Berliner Weisse", 5, null, 8, 8, "beer-6299757_4b5f4_sm"],
+  ["craft", "FACTORY IPA MILKSHAKE", "Robim Good Brewery", "BY", "IPA - Milkshake", 6.2, 25, 8, 8, "beer-5922097_08d5f_sm"],
+  ["craft", "Tomato Factory BBQ", "Robim Good", "BY", "Sour -Tomato /Vegetable Gose", 6, null, 8, 8, "beer-6514539_d0b41_sm"],
+  ["craft", "Rager: Krush", "Valaduta Brovar", "BY", "IPA - Imperial / Double", 6.8, 70, 8, 8, "beer-6909842_60415_sm"],
+  ["craft", "Образец Мутный ХЗ-1", "Zavod", "BY", "IPA - New England / Hazy", 6.1, 50, 8, 8, "beer-6698917_9abc6_sm"],
+  ["other", "Гозе", "Black Cat Brewery", "RU", "Sour - Traditional Gose", 5.3, null, 9, 9, "beer-6858986_be274_sm"],
+  ["other", "Pulse. Mango Plum Passion Fruit", "Hops Brewery", "BY", "Sour - Fruited", 6, null, 8, 8, "beer-6715946_19874_sm"],
+  ["other", "MASS/01", "Zavod", "BY", "Sour - Fruited", 5.8, 10, 8, 8, "beer-6716296_9f33c_sm"],
+];
+
+const flag = cc => cc.replace(/./g, ch => String.fromCodePoint(0x1F1A5 + ch.charCodeAt(0)));
+const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
+
+function tapHtml([, name, brewery, cc, style, abv, ibu, p05, p1, img, badge]) {
+  return `<article class="tap">
+    <img src="https://assets.untappd.com/site/beer_logos/${img}.jpeg" alt="" loading="lazy">
+    <div>
+      <h3>${esc(name)}${badge ? ` <span class="badge">${esc(badge)}</span>` : ""}</h3>
+      <p class="brewery">${flag(cc)} ${esc(brewery)}</p>
+      <div class="stats">
+        <span class="style">${esc(style)}</span>
+        <span class="abv">${abv}%</span>
+        ${ibu != null ? `<span class="ibu">${ibu} IBU</span>` : ""}
+      </div>
+    </div>
+    <div class="prices">
+      <div>0,5 л<strong>${p05} р.</strong></div>
+      <div>1 л<strong>${p1} р.</strong></div>
+    </div>
+  </article>`;
+}
+
+const lanes = [document.createElement("div"), document.createElement("div")];
+lanes.forEach(l => { l.className = "lane"; document.getElementById("lanes").appendChild(l); });
+for (const s of SECTIONS) {
+  const taps = TAPS.filter(t => t[0] === s.id);
+  lanes[s.lane].insertAdjacentHTML("beforeend",
+    `<section class="section" style="--section:${s.color}">
+       <h2>${esc(s.title)}</h2>
+       <div class="list">${taps.map(tapHtml).join("")}</div>
+     </section>`);
+}
+
+// Переключатель вариантов
+const buttons = document.querySelectorAll(".switcher button");
+function setVariant(v) {
+  document.body.className = v;
+  buttons.forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
+  try { localStorage.setItem("taplist-variant", v); } catch (e) {}
+}
+buttons.forEach(b => b.addEventListener("click", () => setVariant(b.dataset.v)));
+let saved = null;
+try { saved = localStorage.getItem("taplist-variant"); } catch (e) {}
+setVariant(saved || "v-original");
+
+document.getElementById("perRow").addEventListener("change", e =>
+  document.documentElement.style.setProperty("--per-row", e.target.value));
+</script>
+</body>
+</html>
