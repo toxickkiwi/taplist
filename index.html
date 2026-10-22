@@ -8,75 +8,50 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --accent: #e8a317;
-    --per-row: 2;
-  }
+  /* Экран бара: всё помещается строго в одно окно. Размеры в rem,
+     а размер rem подбирает скрипт в конце страницы. */
+  :root { --accent: #e8a317; --bg: #161514; --panel: #1d1c1a; --head: #26231f; --brewery: #e58a2e; --muted: #c9c4bb; }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; background: #141414; color-scheme: dark; }
-  body { font-family: Inter, system-ui, sans-serif; }
-  #app { min-height: 100vh; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: #fff; color-scheme: dark; }
+  html { font-size: 10px; }
+  body { font-family: Arial, Helvetica, sans-serif; }
 
-  /* ---------- общая раскладка ---------- */
-  .board { padding-block: 24px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
-  .lanes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
-  .lane { display: flex; flex-direction: column; gap: 24px; }
-  .section h2 { margin: 0 0 12px; }
-  .list { display: grid; grid-template-columns: repeat(var(--per-row), minmax(0, 1fr)); gap: 10px; }
-
-  .tap { position: relative; display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center; padding: 10px 12px; }
-  .tap img { width: 64px; height: 64px; object-fit: contain; display: block; }
-  .tap h3 { margin: 0; font-size: 17px; line-height: 1.15; }
-  .brewery { margin: 3px 0 5px; font-size: 13px; opacity: .8; }
-  .stats { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; }
-  .stats .abv, .stats .ibu { font-weight: 600; white-space: nowrap; }
-  .prices { display: flex; flex-direction: column; gap: 4px; text-align: right; font-size: 13px; white-space: nowrap; }
-  .prices strong { font-size: 18px; margin-left: 6px; }
-  .prices .sep { display: none; }
-  .prices svg { width: 12px; height: 12px; margin-right: 3px; vertical-align: -1px; }
-  .badge { position: absolute; left: 6px; bottom: 6px; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--accent); color: #111; }
-
-  @media (max-width: 1100px) { .lanes { grid-template-columns: minmax(0, 1fr); } }
-  @media (max-width: 640px) {
-    .board { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
-    .list { grid-template-columns: 1fr; }
-    .taplist .section h2 { font-size: 20px; }
-    .taplist .tap { grid-template-columns: 56px minmax(0, 1fr) auto; gap: 12px; }
-    .taplist .tap img, .taplist .badge { width: 56px; }
-    .taplist .tap img { height: 56px; }
-    .taplist .prices, .taplist .prices strong { font-size: 13px; }
+  #app {
+    height: 100vh; height: 100dvh; display: flex;
+    padding-block: .6rem;
+    padding-left: max(.6rem, env(safe-area-inset-left, 0px));
+    padding-right: max(.6rem, env(safe-area-inset-right, 0px));
   }
+  .lanes { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .6rem; }
+  .lane { min-height: 0; display: flex; flex-direction: column; gap: .6rem; }
 
-  /* ---------- оформление как на экране бара ---------- */
-  .taplist { background: #161514; color: #fff; font-family: Arial, Helvetica, sans-serif; }
-  .taplist .board { padding-block: 10px; }
-  .taplist .lanes, .taplist .lane { gap: 10px; }
-  .taplist .section { background: #1d1c1a; border-left: 6px solid var(--section); padding: 0 16px 16px; }
-  .taplist .section h2 {
-    margin: 0 -16px 16px; padding: 12px 16px;
-    background: linear-gradient(90deg, color-mix(in srgb, var(--section) 14%, #26231f), #26231f);
-    text-align: center; text-transform: uppercase; letter-spacing: .03em;
-    font-family: Montserrat, "Arial Black", Arial, sans-serif; font-size: 26px; font-weight: 800; color: #fff;
+  .section { flex: var(--grow) 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--panel); border-left: .6rem solid var(--section); }
+  .section h2 {
+    flex: none; margin: 0; padding: .9rem 1.6rem;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--section) 14%, var(--head)), var(--head));
+    text-align: center; text-transform: uppercase; letter-spacing: .03em; line-height: 1.1;
+    font-family: Montserrat, "Arial Black", Arial, sans-serif; font-size: 2.6rem; font-weight: 800;
   }
-  .taplist .list { gap: 16px 28px; }
-  .taplist .tap { grid-template-columns: 76px minmax(0, 1fr) auto; gap: 18px; padding: 0; }
-  .taplist .tap img { width: 76px; height: 76px; object-fit: cover; background: #fff; border-radius: 3px; box-shadow: 0 3px 8px rgba(0,0,0,.6); }
-  .taplist .tap h3 { font-size: 15px; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .taplist .brewery { margin: 4px 0 8px; opacity: 1; color: #e58a2e; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .taplist .stats { gap: 0; font-size: 10px; font-weight: 700; color: #c9c4bb; }
-  .taplist .stats span + span::before { content: "·"; margin: 0 6px; }
-  .taplist .prices { text-align: left; font-size: 14px; font-weight: 700; gap: 6px; }
-  .taplist .prices strong { font-size: 14px; margin: 0; }
-  .taplist .prices .sep { display: inline; margin: 0 4px; }
-  .taplist .badge { left: 0; bottom: -6px; width: 76px; text-align: center; border-radius: 999px; padding: 1px 0; font-size: 10px; }
+  .list { flex: 1 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: space-evenly; gap: 1.4rem 2.8rem; padding: 1.4rem 1.6rem; }
 
+  .tap { position: relative; display: grid; grid-template-columns: 7.6rem minmax(0, 1fr) auto; gap: 1.8rem; align-items: center; }
+  .tap img { display: block; width: 7.6rem; height: 7.6rem; object-fit: cover; background: #fff; border-radius: .3rem; box-shadow: 0 .3rem .8rem rgba(0,0,0,.6); }
+  .tap h3 { margin: 0; font-size: 1.5rem; font-weight: 400; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .brewery { margin: .4rem 0 .8rem; color: var(--brewery); font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stats { display: flex; flex-wrap: wrap; font-size: 1rem; font-weight: 700; color: var(--muted); }
+  .stats span { white-space: nowrap; }
+  .stats span + span::before { content: "·"; margin: 0 .6rem; }
+  .prices { display: flex; flex-direction: column; gap: .6rem; font-size: 1.4rem; font-weight: 700; white-space: nowrap; }
+  .prices .sep { margin: 0 .4rem; }
+  .prices svg { width: 1.2rem; height: 1.2rem; margin-right: .3rem; vertical-align: -.1rem; }
+  .badge { position: absolute; left: 0; bottom: -.6rem; width: 7.6rem; padding: .1rem 0; border-radius: 999px; background: var(--accent); color: #111; text-align: center; font-size: 1rem; font-weight: 800; }
 </style>
 </head>
 <body>
 <div id="app" class="taplist">
 
-<main class="board"><div class="lanes" id="lanes"></div></main>
+<div class="lanes" id="lanes"></div>
 
 <script>
 // Данные вытащены из страницы taplist (venue 28). Цены — в рублях.
@@ -159,12 +134,28 @@ lanes.forEach(l => { l.className = "lane"; document.getElementById("lanes").appe
 for (const s of SECTIONS) {
   const taps = TAPS.filter(t => t[0] === s.id);
   lanes[s.lane].insertAdjacentHTML("beforeend",
-    `<section class="section" style="--section:${s.color}">
+    `<section class="section" style="--section:${s.color}; --grow:${Math.ceil(taps.length / 2) + 0.8}">
        <h2>${esc(s.title)}</h2>
        <div class="list">${taps.map(tapHtml).join("")}</div>
      </section>`);
 }
 
+
+// Подбираем размер так, чтобы весь таплист влез в окно без прокрутки.
+const sections = [...document.querySelectorAll(".section")];
+const fits = () => sections.every(sec => sec.scrollHeight <= sec.clientHeight + 1 && sec.scrollWidth <= sec.clientWidth + 1);
+function fit() {
+  let lo = 2, hi = 40;
+  for (let i = 0; i < 14; i++) {
+    const mid = (lo + hi) / 2;
+    document.documentElement.style.fontSize = mid + "px";
+    if (fits()) lo = mid; else hi = mid;
+  }
+  document.documentElement.style.fontSize = lo + "px";
+}
+fit();
+addEventListener("resize", fit);
+document.fonts?.ready.then(fit);
 </script>
 </div>
 </body>
