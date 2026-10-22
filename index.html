@@ -271,8 +271,12 @@ const glass = color => `<svg class="glass" viewBox="0 0 64 64" aria-hidden="true
   <path d="M24 18l2 38" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-linecap="round"/>
 </svg>`;
 
+// В базе одна и та же пивоварня записана по-разному — на экране показываем одно имя.
+const BREWERY_ALIASES = { "Robim Good": "Robim Good Brewery", "Brewlok": "Brewlok Brewery" };
+
 function tapHtml(t, num) {
-  const [section, name, brewery, cc, style, abv, ibu, p05, p1, img, tag] = t;
+  const [section, name, rawBrewery, cc, style, abv, ibu, p05, p1, img, tag] = t;
+  const brewery = BREWERY_ALIASES[rawBrewery] || rawBrewery;
   const isRg = /^Robim Good/i.test(brewery);
   const isZero = abv === 0;
   const tagKey = tag || (isZero ? "ZERO" : null);
