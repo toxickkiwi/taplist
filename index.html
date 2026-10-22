@@ -6,7 +6,7 @@
 <title>Варианты таплиста</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;800&family=Caveat:wght@600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Montserrat:wght@800&family=Inter:wght@400;600;800&family=Caveat:wght@600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --accent: #e8a317;
@@ -52,6 +52,8 @@
   .stats .abv, .stats .ibu { font-weight: 600; white-space: nowrap; }
   .prices { display: flex; flex-direction: column; gap: 4px; text-align: right; font-size: 13px; white-space: nowrap; }
   .prices strong { font-size: 18px; margin-left: 6px; }
+  .prices .sep { display: none; }
+  .prices svg { width: 12px; height: 12px; margin-right: 3px; vertical-align: -1px; }
   .badge { position: absolute; left: 6px; bottom: 6px; font-size: 11px; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--accent); color: #111; }
 
   @media (max-width: 1100px) { .lanes { grid-template-columns: 1fr; } }
@@ -60,11 +62,28 @@
     .list { grid-template-columns: 1fr; }
   }
 
-  /* ========== 1. Оригинал (приблизительно как сейчас) ========== */
-  .v-original { background: #141414; color: #f3efe6; }
-  .v-original .section h2 { font-family: Oswald, sans-serif; text-transform: uppercase; letter-spacing: .04em; font-size: 22px; color: var(--section); border-bottom: 3px solid var(--section); padding-bottom: 6px; }
-  .v-original .tap { background: #1f1f1f; border-radius: 10px; border-left: 4px solid var(--section); }
-  .v-original .prices strong { color: var(--accent); }
+  /* ========== 1. Как сейчас (повторяет текущий экран бара) ========== */
+  .v-original { background: #161514; color: #fff; font-family: Arial, Helvetica, sans-serif; }
+  .v-original .board { padding-block: 10px; }
+  .v-original .lanes, .v-original .lane { gap: 10px; }
+  .v-original .section { background: #1d1c1a; border-left: 6px solid var(--section); padding: 0 16px 16px; }
+  .v-original .section h2 {
+    margin: 0 -16px 16px; padding: 12px 16px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--section) 14%, #26231f), #26231f);
+    text-align: center; text-transform: uppercase; letter-spacing: .03em;
+    font-family: Montserrat, "Arial Black", Arial, sans-serif; font-size: 26px; font-weight: 800; color: #fff;
+  }
+  .v-original .list { gap: 16px 28px; }
+  .v-original .tap { grid-template-columns: 76px minmax(0, 1fr) auto; gap: 18px; padding: 0; }
+  .v-original .tap img { width: 76px; height: 76px; object-fit: cover; background: #fff; border-radius: 3px; box-shadow: 0 3px 8px rgba(0,0,0,.6); }
+  .v-original .tap h3 { font-size: 15px; font-weight: 400; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .v-original .brewery { margin: 4px 0 8px; opacity: 1; color: #e58a2e; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .v-original .stats { gap: 0; font-size: 10px; font-weight: 700; color: #c9c4bb; }
+  .v-original .stats span + span::before { content: "·"; margin: 0 6px; }
+  .v-original .prices { text-align: left; font-size: 14px; font-weight: 700; gap: 6px; }
+  .v-original .prices strong { font-size: 14px; margin: 0; }
+  .v-original .prices .sep { display: inline; margin: 0 4px; }
+  .v-original .badge { left: 0; bottom: -6px; width: 76px; text-align: center; border-radius: 999px; padding: 1px 0; font-size: 10px; }
 
   /* ========== 2. Меловая доска ========== */
   .v-chalk { background: #232a26 radial-gradient(circle at 30% 20%, #2d3631 0, #1c221f 70%); color: #f2f0e8; }
@@ -128,14 +147,14 @@ const SECTIONS = [
   { id: "other",      title: "Не пиво",                 color: "#b94343", lane: 1 },
 ];
 
-// [секция, название, пивоварня, страна, стиль, ABV, IBU, цена 0,5, цена 1 л, картинка, бейдж]
+// [секция, название, пивоварня, страна, стиль, ABV, IBU, цена 0,5, цена 1 л, картинка, бейдж, иконки тары]
 const TAPS = [
   ["light", "Grimbergen Blonde", "Alken-Maes", "FR", "Belgian Blonde", 6.7, 22, 8, 8, "beer-2_e6322_sm", "1.5=2"],
   ["light", "Krušovice 10 / Královské Světlé", "Heineken", "RU", "Lager - Světlé (Czech Pale)", 4.2, 23, 8, 8, "beer-23585_cc122_sm"],
   ["light", "Robim Good ZERO", "Robim Good Brewery", "BY", "Non-Alcoholic - Lager", 0, 20, 8, 8, "beer-6772340_d9f07_sm"],
   ["light", "Robim Good NORD", "Robim Good Brewery", "BY", "Pilsner - Czech / Bohemian", 4.8, 30, 8, 8, "beer-6752580_81765_sm"],
   ["unfiltered", "Beaver Леденцовое (Ledentsovoe)", "BEAVER (Пивоваренная компания БИВЕР)", "BY", "Lager - Pale", 5.2, null, 8, 8, "beer-3512093_fe17b_sm", "NEW"],
-  ["unfiltered", "FAVORITE EURO LAGER", "BEAVER (Пивоваренная компания БИВЕР)", "BY", "Lager - Pale", 4.7, null, 9, 9, "beer-271865_e9e41_sm"],
+  ["unfiltered", "FAVORITE EURO LAGER", "BEAVER (Пивоваренная компания БИВЕР)", "BY", "Lager - Pale", 4.7, null, 9, 9, "beer-271865_e9e41_sm", null, true],
   ["unfiltered", "Robim Good SVEZAK", "Robim Good Brewery", "BY", "Lager - Světlé (Czech Pale)", 4.6, 13, 8, 8, "beer-3781653_d973a_sm"],
   ["unfiltered", "Robim Good OKTOBERFEST", "Robim Good Brewery", "BY", "Festbier", 6, 20, 8, 8, "beer-6868970_3ceeb_sm"],
   ["wheat", "Kronenbourg 1664 Blanc", "Brasseries Kronenbourg", "BY", "Wheat Beer - Witbier / Blanche", 5, 7, 8, 8, "beer-5999_bbc68_sm"],
@@ -149,8 +168,8 @@ const TAPS = [
   ["dark", "Кощей", "Brewlok", "RU", "Stout - Coffee", 6.9, null, 9, 9, "beer-1731404_08e92_sm"],
   ["dark", "Pastry Worldwide: Chocolate, Cinnamon And Carob Syrup", "Black Cat Brewery", "RU", "Stout - Imperial / Double Pastry", 12.1, 7, 8, 8, "beer-6504522_b327d_sm"],
   ["dark", "Robim Good SUBSTANCE", "Robim Good Brewery", "BY", "Stout - Irish Dry", 6.4, 10, 8, 8, "beer-6057948_4bde2_sm"],
-  ["craft", "70", "Black Cat Brewery", "RU", "IPA - American", 6.6, 70, 8, 8, "beer-1070427_c6c65_sm"],
-  ["craft", "Moscow Calling", "Black Cat Brewery", "BY", "Bitter - Best", 4.7, 30, 8, 8, "beer-5230956_29177_sm"],
+  ["craft", "70", "Black Cat Brewery", "RU", "IPA - American", 6.6, 70, 8, 8, "beer-1070427_c6c65_sm", null, true],
+  ["craft", "Moscow Calling", "Black Cat Brewery", "BY", "Bitter - Best", 4.7, 30, 8, 8, "beer-5230956_29177_sm", null, true],
   ["craft", "Street Code", "Black Cat Brewery", "RU", "Sour - Fruited", 6.5, null, 8, 8, "beer-6455202_09956_sm"],
   ["craft", "Лихо Одноглазое", "Brewlok Brewery", "RU", "DIPA", 6.9, 120, 8, 8, "beer-1802346_97680_sm"],
   ["craft", "Офицер Дуфи", "Duble", "RU", "Sour - Smoothie / Pastry", 6.2, 9, 8, 8, "beer-6647293_d0807_sm"],
@@ -171,7 +190,10 @@ const TAPS = [
 const flag = cc => cc.replace(/./g, ch => String.fromCodePoint(0x1F1A5 + ch.charCodeAt(0)));
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 
-function tapHtml([, name, brewery, cc, style, abv, ibu, p05, p1, img, badge]) {
+const MUG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4 4h13v3h1.5a4.5 4.5 0 0 1 0 9H17v2a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V4Zm13 6v3h1.5a1.5 1.5 0 0 0 0-3H17Z"/></svg>';
+const BOTTLE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 2h6v5.4l2.25 3.15c.49.69.75 1.52.75 2.37V19a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6.08c0-.85.26-1.68.75-2.37L9 7.4V2Z"/></svg>';
+
+function tapHtml([, name, brewery, cc, style, abv, ibu, p05, p1, img, badge, icons]) {
   return `<article class="tap">
     <img src="https://assets.untappd.com/site/beer_logos/${img}.jpeg" alt="" loading="lazy">
     <div>
@@ -184,8 +206,8 @@ function tapHtml([, name, brewery, cc, style, abv, ibu, p05, p1, img, badge]) {
       </div>
     </div>
     <div class="prices">
-      <div>0,5 л<strong>${p05} р.</strong></div>
-      <div>1 л<strong>${p1} р.</strong></div>
+      <div>${icons ? MUG : ""}0,5 л<span class="sep">–</span><strong>${p05} р.</strong></div>
+      <div>${icons ? BOTTLE : ""}1 л<span class="sep">–</span><strong>${p1} р.</strong></div>
     </div>
   </article>`;
 }
