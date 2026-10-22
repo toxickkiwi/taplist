@@ -6,19 +6,30 @@
 <title>Таплист</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 <style>
   /* Экран бара: всё помещается строго в одно окно. Размеры в rem,
      а размер rem подбирает скрипт в конце страницы. */
-  :root { --accent: #e8a317; --bg: #161514; --panel: #1d1c1a; --head: #26231f; --brewery: #e58a2e; --muted: #c9c4bb; }
+  :root {
+    --bg: #121110; --panel: #1c1a18; --fg: #fff; --muted: #b9b2a7; --line: rgba(255,255,255,.08);
+    --price: #ffd23f; --brewery: #f0953a;
+    --rg: #22c3b0;      /* фирменный цвет Robim Good — заменить на настоящий */
+    --zero: #38bdf8;
+    --t-new: #22c55e; --t-sale: #ef4444; --t-promo: #facc15; --t-top: #a855f7;
+  }
+  .light {
+    --bg: #ece7dd; --panel: #fffdf9; --fg: #17130f; --muted: #5f564b; --line: rgba(0,0,0,.08);
+    --price: #b45309; --brewery: #c2410c;
+  }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: #fff; color-scheme: dark; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #121110; color-scheme: dark; }
   html { font-size: 10px; }
   body { font-family: Arial, Helvetica, sans-serif; }
 
   #app {
     height: 100vh; height: 100dvh; display: flex;
+    background: var(--bg); color: var(--fg);
     padding-block: .6rem;
     padding-left: max(.6rem, env(safe-area-inset-left, 0px));
     padding-right: max(.6rem, env(safe-area-inset-right, 0px));
@@ -26,55 +37,183 @@
   .lanes { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .6rem; }
   .lane { min-height: 0; display: flex; flex-direction: column; gap: .6rem; }
 
-  .section { flex: var(--grow) 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--panel); border-left: .6rem solid var(--section); }
+  /* ---------- секции: яркая шапка цвета сорта ---------- */
+  .section { flex: var(--grow) 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--panel); border-radius: .6rem; }
   .section h2 {
-    flex: none; margin: 0; padding: .9rem 1.6rem;
-    background: linear-gradient(90deg, color-mix(in srgb, var(--section) 14%, var(--head)), var(--head));
-    text-align: center; text-transform: uppercase; letter-spacing: .03em; line-height: 1.1;
-    font-family: Montserrat, "Arial Black", Arial, sans-serif; font-size: 2.6rem; font-weight: 800;
+    flex: none; margin: 0; padding: .7rem 1.6rem;
+    background: var(--section); color: var(--section-fg);
+    text-align: center; text-transform: uppercase; letter-spacing: .04em; line-height: 1.1;
+    font-family: Montserrat, "Arial Black", Arial, sans-serif; font-size: 2.8rem; font-weight: 900;
   }
-  .list { flex: 1 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: space-evenly; gap: 1.4rem 2.8rem; padding: 1.4rem 1.6rem; }
+  .list { flex: 1 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: space-evenly; gap: .8rem 1.6rem; padding: 1rem 1.2rem; }
 
-  .tap { position: relative; display: grid; grid-template-columns: 7.6rem minmax(0, 1fr) auto; gap: 1.8rem; align-items: center; }
-  .tap img { display: block; width: 7.6rem; height: 7.6rem; object-fit: cover; background: #fff; border-radius: .3rem; box-shadow: 0 .3rem .8rem rgba(0,0,0,.6); }
-  .tap h3 { margin: 0; font-size: 1.5rem; font-weight: 400; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .brewery { margin: .4rem 0 .8rem; color: var(--brewery); font-size: 1.1rem; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .stats { display: flex; flex-wrap: wrap; font-size: 1rem; font-weight: 700; color: var(--muted); }
+  /* ---------- карточка сорта ---------- */
+  .tap {
+    position: relative; display: grid; align-items: center; gap: 1.2rem;
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    padding: .5rem .8rem; border: .25rem solid transparent; border-radius: .8rem;
+  }
+  .num { min-width: 4.4rem; text-align: center; font-family: Montserrat, Arial, sans-serif; font-weight: 900; font-size: 3.4rem; line-height: 1; color: var(--section); font-variant-numeric: tabular-nums; }
+  .no-num .num { display: none; }
+
+  .media { position: relative; width: 6.4rem; height: 6.4rem; flex: none; }
+  .media img, .media .glass { width: 100%; height: 100%; }
+  .media img { display: block; }
+  .media .glass { display: none; }
+
+  /* картинки: 1) логотип в одинаковой белой плитке */
+  .img-tile .media img { object-fit: contain; background: #fff; border-radius: .6rem; padding: .3rem; box-shadow: 0 .2rem .6rem rgba(0,0,0,.35); }
+  /* 2) круг с обводкой цвета отдела */
+  .img-circle .media img { object-fit: cover; border-radius: 50%; background: #fff; box-shadow: 0 0 0 .3rem var(--section); }
+  /* 3) бокал, залитый цветом пива — без логотипов */
+  .img-glass .media img { display: none; }
+  .img-glass .media .glass { display: block; }
+  /* 4) без картинок */
+  .img-none .media { display: none; }
+  .img-none .tap { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .no-num.img-none .tap { grid-template-columns: minmax(0, 1fr) auto; }
+  .no-num:not(.img-none) .tap { grid-template-columns: auto minmax(0, 1fr) auto; }
+
+  .info { min-width: 0; }
+  .tap h3 { margin: 0; font-size: 2.1rem; font-weight: 700; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .brewery { margin: .3rem 0 .4rem; color: var(--brewery); font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stats { display: flex; flex-wrap: wrap; align-items: baseline; font-size: 1.15rem; color: var(--muted); }
   .stats span { white-space: nowrap; }
-  .stats span + span::before { content: "·"; margin: 0 .6rem; }
-  .prices { display: flex; flex-direction: column; gap: .6rem; font-size: 1.4rem; font-weight: 700; white-space: nowrap; }
-  .prices .sep { margin: 0 .4rem; }
-  .prices svg { width: 1.2rem; height: 1.2rem; margin-right: .3rem; vertical-align: -.1rem; }
-  .badge { position: absolute; left: 0; bottom: -.6rem; width: 7.6rem; padding: .1rem 0; border-radius: 999px; background: var(--accent); color: #111; text-align: center; font-size: 1rem; font-weight: 800; }
+  .stats span + span::before { content: "·"; margin: 0 .5rem; }
+  .stats .abv { color: var(--fg); font-weight: 800; font-size: 1.35rem; }
+
+  .prices { display: grid; grid-template-columns: auto auto; gap: .2rem .7rem; align-items: baseline; white-space: nowrap; }
+  .prices span { font-size: 1.3rem; color: var(--muted); text-align: right; }
+  .prices strong { font-size: 2.4rem; font-weight: 900; color: var(--price); font-family: Montserrat, Arial, sans-serif; font-variant-numeric: tabular-nums; }
+  .prices small { font-size: .6em; margin-left: .15em; }
+
+  /* ---------- Robim Good и нулёвки ---------- */
+  .rg-mark { display: none; margin-right: .5rem; padding: .1rem .45rem; border-radius: .4rem; background: var(--rg); color: #062a26; font: 900 1.2rem/1.3 Montserrat, Arial, sans-serif; vertical-align: .35rem; }
+  .rg-on .tap.rg .rg-mark { display: inline-block; }
+  .rg-on .tap.rg .brewery { color: var(--rg); }
+  .rg-frame .tap.rg { border-color: var(--rg); }
+  .rg-fill .tap.rg { background: color-mix(in srgb, var(--rg) 16%, transparent); }
+  .rg-on .tap.zero { --rg: var(--zero); }
+  .rg-on .tap.zero .rg-mark { background: var(--zero); color: #04263a; }
+
+  /* ---------- метки ---------- */
+  .tag { display: inline-flex; align-items: center; gap: .3rem; border-radius: .5rem; padding: .25rem .7rem; font: 900 1.35rem/1.1 Montserrat, Arial, sans-serif; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; background: var(--tc); color: var(--tfg, #fff); }
+  .tag.new   { --tc: var(--t-new); }
+  .tag.sale  { --tc: var(--t-sale); }
+  .tag.promo { --tc: var(--t-promo); --tfg: #1a1300; }
+  .tag.top   { --tc: var(--t-top); }
+  .tag.zero  { --tc: var(--zero); --tfg: #04263a; }
+  .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .4rem; }
+  .ribbon { display: none; }
+
+  /* вариант «ленточка»: наискосок через угол картинки */
+  .tags-ribbon .tags { display: none; }
+  .tags-ribbon .ribbon { display: block; position: absolute; inset: 0; overflow: hidden; border-radius: .6rem; pointer-events: none; }
+  .tags-ribbon .ribbon .tag { position: absolute; top: 1.2rem; left: -2.8rem; width: 11rem; justify-content: center; transform: rotate(-45deg); border-radius: 0; padding: .25rem 0; font-size: 1.3rem; box-shadow: 0 .2rem .5rem rgba(0,0,0,.4); }
+  .tags-ribbon.img-none .tags { display: flex; }
+
+  /* вариант «как сейчас»: мелкая жёлтая плашка под картинкой (для сравнения) */
+  .tags-old .tags { display: none; }
+  .tags-old .ribbon { display: block; position: absolute; left: 0; right: 0; bottom: -.5rem; text-align: center; }
+  .tags-old .ribbon .tag { background: #e8a317; color: #111; font: 800 1rem/1.2 Arial, sans-serif; padding: .05rem .5rem; border-radius: 99px; text-transform: none; }
+
+  /* ---------- панель настроек (на ТВ прячется сама) ---------- */
+  .gear {
+    position: fixed; right: max(1rem, env(safe-area-inset-right, 0px)); bottom: max(1rem, env(safe-area-inset-bottom, 0px)); z-index: 20;
+    width: 44px; height: 44px; border-radius: 50%; border: 0; cursor: pointer;
+    background: rgba(0,0,0,.6); color: #fff; font-size: 22px; transition: opacity .3s;
+  }
+  .idle .gear { opacity: 0; }
+  .panel {
+    position: fixed; right: max(1rem, env(safe-area-inset-right, 0px)); bottom: calc(max(1rem, env(safe-area-inset-bottom, 0px)) + 54px); z-index: 20;
+    width: min(340px, calc(100vw - 32px)); max-height: calc(100vh - 90px); overflow: auto;
+    padding: 14px 16px; border-radius: 12px; background: #fff; color: #17130f;
+    font: 14px/1.35 Arial, sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,.5);
+  }
+  .panel h4 { margin: 12px 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: #7a6f62; }
+  .panel h4:first-child { margin-top: 0; }
+  .opts { display: flex; flex-wrap: wrap; gap: 6px; }
+  .opts label { cursor: pointer; }
+  .opts input { position: absolute; opacity: 0; }
+  .opts span { display: inline-block; padding: 5px 10px; border-radius: 99px; border: 1px solid #d6cdbf; }
+  .opts input:checked + span { background: #17130f; border-color: #17130f; color: #fff; }
+  .opts input:focus-visible + span { outline: 2px solid #f0953a; outline-offset: 2px; }
+  .panel p { margin: 12px 0 0; font-size: 12px; color: #7a6f62; }
+
+  @media (prefers-reduced-motion: reduce) { .gear { transition: none; } }
 </style>
 </head>
 <body>
-<div id="app" class="taplist">
+<div id="app">
+  <div class="lanes" id="lanes"></div>
+</div>
 
-<div class="lanes" id="lanes"></div>
+<button class="gear" id="gear" type="button" aria-label="Настройки вида" aria-expanded="false">⚙</button>
+<form class="panel" id="panel" hidden>
+  <h4>Нумерация</h4>
+  <div class="opts" data-key="num">
+    <label><input type="radio" name="num" value="dept"><span>По отделам</span></label>
+    <label><input type="radio" name="num" value="all"><span>Сквозная</span></label>
+    <label><input type="radio" name="num" value="off"><span>Без номеров</span></label>
+  </div>
+  <h4>Картинки</h4>
+  <div class="opts" data-key="img">
+    <label><input type="radio" name="img" value="tile"><span>Плитка</span></label>
+    <label><input type="radio" name="img" value="circle"><span>Круг</span></label>
+    <label><input type="radio" name="img" value="glass"><span>Бокал по цвету</span></label>
+    <label><input type="radio" name="img" value="none"><span>Без картинок</span></label>
+  </div>
+  <h4>Robim Good и нулёвки</h4>
+  <div class="opts" data-key="rg">
+    <label><input type="radio" name="rg" value="fill"><span>Фон</span></label>
+    <label><input type="radio" name="rg" value="frame"><span>Рамка</span></label>
+    <label><input type="radio" name="rg" value="off"><span>Не выделять</span></label>
+  </div>
+  <h4>Метки</h4>
+  <div class="opts" data-key="tags">
+    <label><input type="radio" name="tags" value="pill"><span>Плашка над названием</span></label>
+    <label><input type="radio" name="tags" value="ribbon"><span>Ленточка на картинке</span></label>
+    <label><input type="radio" name="tags" value="old"><span>Как сейчас</span></label>
+  </div>
+  <h4>Фон</h4>
+  <div class="opts" data-key="theme">
+    <label><input type="radio" name="theme" value="dark"><span>Тёмный</span></label>
+    <label><input type="radio" name="theme" value="light"><span>Светлый</span></label>
+  </div>
+  <p>Настройки запоминаются в этом браузере. Кнопка ⚙ прячется, если не двигать мышь.</p>
+</form>
 
 <script>
-// Данные вытащены из страницы taplist (venue 28). Цены — в рублях.
+// Цвет шапки отдела и цвет текста на ней.
 const SECTIONS = [
-  { id: "light",      title: "Светлое фильтрованное",   color: "#d7a742", lane: 0 },
-  { id: "wheat",      title: "Пшеничное",               color: "#f0d270", lane: 0 },
-  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#df7b32", lane: 0 },
-  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#c8ad68", lane: 1 },
-  { id: "dark",       title: "Тёмное",                  color: "#a56a4a", lane: 1 },
-  { id: "other",      title: "Не пиво",                 color: "#b94343", lane: 1 },
+  { id: "light",      title: "Светлое фильтрованное",   color: "#f5c518", fg: "#1a1300", lane: 0 },
+  { id: "wheat",      title: "Пшеничное",               color: "#ffe17a", fg: "#1a1300", lane: 0 },
+  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#ff7a1a", fg: "#1a0b00", lane: 0 },
+  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#e9b949", fg: "#1a1300", lane: 1 },
+  { id: "dark",       title: "Тёмное",                  color: "#9b3d22", fg: "#fff",    lane: 1 },
+  { id: "other",      title: "Не пиво",                 color: "#e0436b", fg: "#fff",    lane: 1 },
 ];
 
-// [секция, название, пивоварня, страна, стиль, ABV, IBU, цена 0,5, цена 1 л, картинка, бейдж, иконки тары]
+// Метки, которые есть в админке: Zero, New, %, 1.5=2, Top.
+const TAGS = {
+  "NEW":   { cls: "new",   text: "Новинка",  short: "NEW" },
+  "%":     { cls: "sale",  text: "% Акция",  short: "%" },
+  "1.5=2": { cls: "promo", text: "1,5 = 2 л", short: "1,5=2" },
+  "TOP":   { cls: "top",   text: "★ Топ",    short: "TOP" },
+  "ZERO":  { cls: "zero",  text: "0,0%",     short: "0,0" },
+};
+
+// [секция, название, пивоварня, страна, стиль, ABV, IBU, цена 0,5, цена 1 л, картинка, метка]
 const TAPS = [
   ["light", "Grimbergen Blonde", "Alken-Maes", "FR", "Belgian Blonde", 6.7, 22, 8, 8, "beer-2_e6322_sm", "1.5=2"],
   ["light", "Krušovice 10 / Královské Světlé", "Heineken", "RU", "Lager - Světlé (Czech Pale)", 4.2, 23, 8, 8, "beer-23585_cc122_sm"],
   ["light", "Robim Good ZERO", "Robim Good Brewery", "BY", "Non-Alcoholic - Lager", 0, 20, 8, 8, "beer-6772340_d9f07_sm"],
   ["light", "Robim Good NORD", "Robim Good Brewery", "BY", "Pilsner - Czech / Bohemian", 4.8, 30, 8, 8, "beer-6752580_81765_sm"],
   ["unfiltered", "Beaver Леденцовое (Ledentsovoe)", "BEAVER (Пивоваренная компания БИВЕР)", "BY", "Lager - Pale", 5.2, null, 8, 8, "beer-3512093_fe17b_sm", "NEW"],
-  ["unfiltered", "FAVORITE EURO LAGER", "BEAVER (Пивоваренная компания БИВЕР)", "BY", "Lager - Pale", 4.7, null, 9, 9, "beer-271865_e9e41_sm", null, true],
+  ["unfiltered", "FAVORITE EURO LAGER", "BEAVER (Пивоваренная компания БИВЕР)", "BY", "Lager - Pale", 4.7, null, 9, 9, "beer-271865_e9e41_sm"],
   ["unfiltered", "Robim Good SVEZAK", "Robim Good Brewery", "BY", "Lager - Světlé (Czech Pale)", 4.6, 13, 8, 8, "beer-3781653_d973a_sm"],
   ["unfiltered", "Robim Good OKTOBERFEST", "Robim Good Brewery", "BY", "Festbier", 6, 20, 8, 8, "beer-6868970_3ceeb_sm"],
-  ["wheat", "Kronenbourg 1664 Blanc", "Brasseries Kronenbourg", "BY", "Wheat Beer - Witbier / Blanche", 5, 7, 8, 8, "beer-5999_bbc68_sm"],
+  ["wheat", "Kronenbourg 1664 Blanc", "Brasseries Kronenbourg", "BY", "Wheat Beer - Witbier / Blanche", 5, 7, 8, 8, "beer-5999_bbc68_sm", "%"],
   ["wheat", "Edelweiss Weizenbier", "Brau Union Österreich", "RU", "Wheat Beer - Hefeweizen", 5.3, null, 8, 8, "beer-3916373_a8fe9_sm"],
   ["wheat", "Edelweiss Snowfresh", "Brau Union Österreich", "RU", "Wheat Beer - Hefeweizen", 4.9, null, 9, 9, "beer-EdelweissSnowfresh_14622"],
   ["wheat", "Robim Good WAKE UP", "Robim Good Brewery", "BY", "Bock - Weizenbock", 6.5, 8, 8, 8, "beer-4091677_839df_sm"],
@@ -85,11 +224,11 @@ const TAPS = [
   ["dark", "Кощей", "Brewlok", "RU", "Stout - Coffee", 6.9, null, 9, 9, "beer-1731404_08e92_sm"],
   ["dark", "Pastry Worldwide: Chocolate, Cinnamon And Carob Syrup", "Black Cat Brewery", "RU", "Stout - Imperial / Double Pastry", 12.1, 7, 8, 8, "beer-6504522_b327d_sm"],
   ["dark", "Robim Good SUBSTANCE", "Robim Good Brewery", "BY", "Stout - Irish Dry", 6.4, 10, 8, 8, "beer-6057948_4bde2_sm"],
-  ["craft", "70", "Black Cat Brewery", "RU", "IPA - American", 6.6, 70, 8, 8, "beer-1070427_c6c65_sm", null, true],
-  ["craft", "Moscow Calling", "Black Cat Brewery", "BY", "Bitter - Best", 4.7, 30, 8, 8, "beer-5230956_29177_sm", null, true],
+  ["craft", "70", "Black Cat Brewery", "RU", "IPA - American", 6.6, 70, 8, 8, "beer-1070427_c6c65_sm", "TOP"],
+  ["craft", "Moscow Calling", "Black Cat Brewery", "BY", "Bitter - Best", 4.7, 30, 8, 8, "beer-5230956_29177_sm"],
   ["craft", "Street Code", "Black Cat Brewery", "RU", "Sour - Fruited", 6.5, null, 8, 8, "beer-6455202_09956_sm"],
   ["craft", "Лихо Одноглазое", "Brewlok Brewery", "RU", "DIPA", 6.9, 120, 8, 8, "beer-1802346_97680_sm"],
-  ["craft", "Офицер Дуфи", "Duble", "RU", "Sour - Smoothie / Pastry", 6.2, 9, 8, 8, "beer-6647293_d0807_sm"],
+  ["craft", "Офицер Дуфи", "Duble", "RU", "Sour - Smoothie / Pastry", 6.2, 9, 8, 8, "beer-6647293_d0807_sm", "NEW"],
   ["craft", "СОБАКА СУТУЛАЯ", "Hops Brewery", "BY", "IPA - New England / Hazy", 6.3, 20, 8, 8, "beer-6860662_a3d13_sm"],
   ["craft", "СОЛО КОТ Цитра", "Black Cat Brewery", "BY", "IPA - American", 6.9, 68, 9, 9, "beer-6716775_f95ea_sm"],
   ["craft", "Caramba", "Brewlok Brewery", "BY", "IPA - Milkshake", 6.9, 40, 9, 9, "beer-2654974_2c914_sm"],
@@ -107,44 +246,77 @@ const TAPS = [
 const flag = cc => cc.replace(/./g, ch => String.fromCodePoint(0x1F1A5 + ch.charCodeAt(0)));
 const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[ch]));
 
-const MUG = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M4 4h13v3h1.5a4.5 4.5 0 0 1 0 9H17v2a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V4Zm13 6v3h1.5a1.5 1.5 0 0 0 0-3H17Z"/></svg>';
-const BOTTLE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 2h6v5.4l2.25 3.15c.49.69.75 1.52.75 2.37V19a3 3 0 0 1-3 3H9a3 3 0 0 1-3-3v-6.08c0-.85.26-1.68.75-2.37L9 7.4V2Z"/></svg>';
+// Цвет пива для варианта «бокал»: по стилю, иначе по отделу.
+const CATEGORY_COLOR = { light: "#f2c94c", unfiltered: "#e8b04a", wheat: "#f6d98a", dark: "#3b1d0e", craft: "#e8892f", other: "#d9466f" };
+function beerColor(section, style) {
+  if (/Stout|Black/i.test(style)) return "#24120a";
+  if (/Amber|Red/i.test(style)) return "#a4471b";
+  if (/Sour|Gose/i.test(style)) return "#e0607e";
+  if (/Hazy|New England|Milkshake/i.test(style)) return "#f0a63a";
+  if (/IPA|Bitter/i.test(style)) return "#e08a2a";
+  return CATEGORY_COLOR[section];
+}
+const glass = color => `<svg class="glass" viewBox="0 0 64 64" aria-hidden="true">
+  <path d="M16 12h32l-4 46a4 4 0 0 1-4 4H24a4 4 0 0 1-4-4z" fill="${color}"/>
+  <path d="M14 8c0-3 3-5 6-5 2-2 6-3 9-1 3-2 8-1 10 1 3-1 7 0 9 3 3 0 5 3 4 6H14z" fill="#fff8e7"/>
+  <path d="M24 18l2 38" stroke="rgba(255,255,255,.35)" stroke-width="3" stroke-linecap="round"/>
+</svg>`;
 
-function tapHtml([, name, brewery, cc, style, abv, ibu, p05, p1, img, badge, icons]) {
-  return `<article class="tap">
-    <img src="https://assets.untappd.com/site/beer_logos/${img}.jpeg" alt="" loading="lazy">
-    <div>
-      <h3>${esc(name)}${badge ? ` <span class="badge">${esc(badge)}</span>` : ""}</h3>
+function tapHtml(t, num) {
+  const [section, name, brewery, cc, style, abv, ibu, p05, p1, img, tag] = t;
+  const isRg = /^Robim Good/i.test(brewery);
+  const isZero = abv === 0;
+  const tagKey = tag || (isZero ? "ZERO" : null);
+  const tagDef = tagKey && TAGS[tagKey];
+  const tagHtml = tagDef ? `<span class="tag ${tagDef.cls}">${esc(tagDef.text)}</span>` : "";
+  const ribbonHtml = tagDef ? `<div class="ribbon"><span class="tag ${tagDef.cls}">${esc(tagDef.short)}</span></div>` : "";
+  const shortName = isRg ? name.replace(/^Robim Good\s+/i, "") : name;
+  return `<article class="tap${isRg ? " rg" : ""}${isZero ? " zero" : ""}">
+    <div class="num">${num}</div>
+    <div class="media">
+      <img src="https://assets.untappd.com/site/beer_logos/${img}.jpeg" alt="" loading="lazy">
+      ${glass(beerColor(section, style))}
+      ${ribbonHtml}
+    </div>
+    <div class="info">
+      ${tagHtml ? `<div class="tags">${tagHtml}</div>` : ""}
+      <h3>${isRg ? `<span class="rg-mark">RG</span>` : ""}<span class="full-name">${esc(name)}</span><span class="short-name" hidden>${esc(shortName)}</span></h3>
       <p class="brewery">${flag(cc)} ${esc(brewery)}</p>
       <div class="stats">
-        <span class="style">${esc(style)}</span>
         <span class="abv">${abv}%</span>
         ${ibu != null ? `<span class="ibu">${ibu} IBU</span>` : ""}
+        <span class="style">${esc(style)}</span>
       </div>
     </div>
     <div class="prices">
-      <div>${icons ? MUG : ""}0,5 л<span class="sep">–</span><strong>${p05} р.</strong></div>
-      <div>${icons ? BOTTLE : ""}1 л<span class="sep">–</span><strong>${p1} р.</strong></div>
+      <span>0,5 л</span><strong>${p05}<small>р.</small></strong>
+      <span>1 л</span><strong>${p1}<small>р.</small></strong>
     </div>
   </article>`;
 }
 
+const app = document.getElementById("app");
 const lanes = [document.createElement("div"), document.createElement("div")];
 lanes.forEach(l => { l.className = "lane"; document.getElementById("lanes").appendChild(l); });
-for (const s of SECTIONS) {
-  const taps = TAPS.filter(t => t[0] === s.id);
-  lanes[s.lane].insertAdjacentHTML("beforeend",
-    `<section class="section" style="--section:${s.color}; --grow:${Math.ceil(taps.length / 2) + 0.8}">
-       <h2>${esc(s.title)}</h2>
-       <div class="list">${taps.map(tapHtml).join("")}</div>
-     </section>`);
+
+function render(numbering) {
+  lanes.forEach(l => { l.innerHTML = ""; });
+  let total = 0;
+  for (const s of SECTIONS) {
+    const taps = TAPS.filter(t => t[0] === s.id);
+    const items = taps.map((t, i) => tapHtml(t, numbering === "all" ? ++total : i + 1)).join("");
+    lanes[s.lane].insertAdjacentHTML("beforeend",
+      `<section class="section" style="--section:${s.color}; --section-fg:${s.fg}; --grow:${Math.ceil(taps.length / 2) + 0.8}">
+         <h2>${esc(s.title)}</h2>
+         <div class="list">${items}</div>
+       </section>`);
+  }
 }
 
-
 // Подбираем размер так, чтобы весь таплист влез в окно без прокрутки.
-const sections = [...document.querySelectorAll(".section")];
-const fits = () => sections.every(sec => sec.scrollHeight <= sec.clientHeight + 1 && sec.scrollWidth <= sec.clientWidth + 1);
 function fit() {
+  const sections = [...document.querySelectorAll(".section")];
+  const fits = () => sections.every(sec => sec.scrollHeight <= sec.clientHeight + 1 && sec.scrollWidth <= sec.clientWidth + 1);
   let lo = 2, hi = 40;
   for (let i = 0; i < 14; i++) {
     const mid = (lo + hi) / 2;
@@ -153,10 +325,57 @@ function fit() {
   }
   document.documentElement.style.fontSize = lo + "px";
 }
-fit();
+
+// Настройки вида
+const DEFAULTS = { num: "dept", img: "tile", rg: "fill", tags: "pill", theme: "dark" };
+let settings = { ...DEFAULTS };
+try { Object.assign(settings, JSON.parse(localStorage.getItem("taplist-settings") || "{}")); } catch (e) {}
+
+function apply() {
+  app.className = [
+    settings.num === "off" ? "no-num" : "",
+    "img-" + settings.img,
+    settings.rg === "off" ? "" : "rg-on rg-" + settings.rg,
+    "tags-" + settings.tags,
+    settings.theme === "light" ? "light" : "",
+  ].join(" ");
+  render(settings.num);
+  document.querySelectorAll(".tap.rg").forEach(el => {
+    const on = settings.rg !== "off";
+    el.querySelector(".full-name").hidden = on;
+    el.querySelector(".short-name").hidden = !on;
+  });
+  fit();
+}
+
+const panel = document.getElementById("panel");
+const gear = document.getElementById("gear");
+for (const [key, value] of Object.entries(settings)) {
+  const input = panel.querySelector(`input[name="${key}"][value="${value}"]`);
+  if (input) input.checked = true;
+}
+panel.addEventListener("change", e => {
+  settings[e.target.name] = e.target.value;
+  try { localStorage.setItem("taplist-settings", JSON.stringify(settings)); } catch (err) {}
+  apply();
+});
+gear.addEventListener("click", () => {
+  panel.hidden = !panel.hidden;
+  gear.setAttribute("aria-expanded", String(!panel.hidden));
+});
+
+let idleTimer;
+function wake() {
+  document.body.classList.remove("idle");
+  clearTimeout(idleTimer);
+  idleTimer = setTimeout(() => { if (panel.hidden) document.body.classList.add("idle"); }, 4000);
+}
+["mousemove", "touchstart", "keydown"].forEach(ev => addEventListener(ev, wake, { passive: true }));
+wake();
+
+apply();
 addEventListener("resize", fit);
 document.fonts?.ready.then(fit);
 </script>
-</div>
 </body>
 </html>
