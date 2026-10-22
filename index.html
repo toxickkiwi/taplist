@@ -11,19 +11,21 @@
   /* Экран бара: всё помещается строго в одно окно. Размеры в rem,
      а размер rem подбирает скрипт в конце страницы. */
   :root {
-    --bg: #121110; --panel: #1c1a18; --fg: #fff; --muted: #b9b2a7; --line: rgba(255,255,255,.08);
-    --price: #ffd23f; --brewery: #c9c1b5;
-    --rg: #ff7a00;      /* фирменный цвет Robim Good */
+    /* палитра Robim Good: кремовый, Black 6 C, оранжевые 2028/165/144, жёлтый 130 */
+    --rg-cream: #f7f2e8; --rg-black: #101820; --rg-red: #C63418; --rg-orange: #EC6608; --rg-amber: #F39000; --rg-yellow: #FAB600;
+    --bg: #17191c; --panel: #222428; --fg: #f7f2e8; --muted: #a9a59c; --line: rgba(255,255,255,.08);
+    --price: var(--rg-yellow); --brewery: #c9c3b8;
+    --rg: var(--rg-orange);
     --zero: #38bdf8;
-    --t-new: #22c55e; --t-sale: #ef4444; --t-promo: #facc15; --t-top: #a855f7;
+    --t-new: #3fae5a; --t-sale: var(--rg-red); --t-promo: var(--rg-yellow); --t-top: var(--rg-cream);
   }
   .light {
-    --bg: #ece7dd; --panel: #fffdf9; --fg: #17130f; --muted: #5f564b; --line: rgba(0,0,0,.08);
-    --price: #b45309; --brewery: #6b6157;
+    --bg: #e9e3d6; --panel: var(--rg-cream); --fg: var(--rg-black); --muted: #5f5a52; --line: rgba(0,0,0,.08);
+    --price: var(--rg-red); --brewery: #5f5a52;
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #121110; color-scheme: dark; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #17191c; color-scheme: dark; }
   html { font-size: 10px; }
   body { font-family: Arial, Helvetica, sans-serif; }
 
@@ -41,10 +43,14 @@
   .section { flex: var(--grow) 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--panel); border-radius: .6rem; }
   .section h2 {
     flex: none; margin: 0; padding: .7rem 1.6rem;
-    background: var(--section); color: var(--section-fg);
+    background: var(--section-bg); color: var(--section-fg); border-bottom: .3rem solid var(--section);
     text-align: center; text-transform: uppercase; letter-spacing: .04em; line-height: 1.1;
     font-family: Montserrat, "Arial Black", Arial, sans-serif; font-size: 2.8rem; font-weight: 900;
   }
+  /* шапки «как бар»: все жёлтые с графитовым текстом */
+  .hdr-bar .section h2 { background: var(--rg-yellow); color: var(--rg-black); border-bottom-color: var(--rg-yellow); }
+  .hdr-bar .num b { color: var(--rg-yellow); }
+  .light.hdr-bar .num b, .light .pale .num b { color: var(--rg-black); }
   .list { flex: 1 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: space-evenly; gap: .8rem 1.6rem; padding: 1rem 1.2rem; }
 
   /* ---------- карточка сорта ---------- */
@@ -99,8 +105,8 @@
   .tag { display: inline-flex; align-items: center; gap: .3rem; border-radius: .5rem; padding: .25rem .7rem; font: 900 1.35rem/1.1 Montserrat, Arial, sans-serif; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; background: var(--tc); color: var(--tfg, #fff); }
   .tag.new   { --tc: var(--t-new); }
   .tag.sale  { --tc: var(--t-sale); }
-  .tag.promo { --tc: var(--t-promo); --tfg: #1a1300; }
-  .tag.top   { --tc: var(--t-top); }
+  .tag.promo { --tc: var(--t-promo); --tfg: var(--rg-black); }
+  .tag.top   { --tc: var(--t-top); --tfg: var(--rg-black); }
   .tag.zero  { --tc: var(--zero); --tfg: #04263a; }
   /* Метки никогда не перекрывают картинку: под фото или под номером. */
   .num .tag, .photo-tag { display: none; }
@@ -167,6 +173,11 @@
     <label><input type="radio" name="tags" value="photo"><span>Под фото</span></label>
     <label><input type="radio" name="tags" value="num"><span>Под номером</span></label>
   </div>
+  <h4>Шапки категорий</h4>
+  <div class="opts" data-key="hdr">
+    <label><input type="radio" name="hdr" value="brand"><span>Цвета Robim Good</span></label>
+    <label><input type="radio" name="hdr" value="bar"><span>Жёлтые, как бар</span></label>
+  </div>
   <h4>Фон</h4>
   <div class="opts" data-key="theme">
     <label><input type="radio" name="theme" value="dark"><span>Тёмный</span></label>
@@ -176,14 +187,14 @@
 </form>
 
 <script>
-// Цвет шапки отдела и цвет текста на ней.
+// Цвета шапок из палитры Robim Good; «Не пиво» — графитовая шапка с кремовой линией.
 const SECTIONS = [
-  { id: "light",      title: "Светлое фильтрованное",   color: "#c99a2e", fg: "#fff", lane: 0 },
-  { id: "wheat",      title: "Пшеничное",               color: "#4f7cc4", fg: "#fff", lane: 0 },
-  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#5e9a45", fg: "#fff", lane: 0 },
-  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#2f9488", fg: "#fff", lane: 1 },
-  { id: "dark",       title: "Тёмное",                  color: "#94456b", fg: "#fff", lane: 1 },
-  { id: "other",      title: "Не пиво",                 color: "#7a62c2", fg: "#fff", lane: 1 },
+  { id: "light",      title: "Светлое фильтрованное",   color: "#FAB600", bg: "#FAB600", fg: "#101820", lane: 0 },
+  { id: "wheat",      title: "Пшеничное",               color: "#f7f2e8", bg: "#f7f2e8", fg: "#101820", lane: 0, pale: true },
+  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#EC6608", bg: "#EC6608", fg: "#f7f2e8", lane: 0 },
+  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#F39000", bg: "#F39000", fg: "#101820", lane: 1 },
+  { id: "dark",       title: "Тёмное",                  color: "#C63418", bg: "#C63418", fg: "#f7f2e8", lane: 1 },
+  { id: "other",      title: "Не пиво",                 color: "#f7f2e8", bg: "#101820", fg: "#f7f2e8", lane: 1, pale: true },
 ];
 
 // Метки, которые есть в админке: Zero, New, %, 1.5=2, Top.
@@ -295,7 +306,7 @@ function render(numbering) {
     const taps = TAPS.filter(t => t[0] === s.id);
     const items = taps.map((t, i) => tapHtml(t, numbering === "all" ? ++total : i + 1)).join("");
     lanes[s.lane].insertAdjacentHTML("beforeend",
-      `<section class="section" style="--section:${s.color}; --section-fg:${s.fg}; --grow:${Math.ceil(taps.length / 2) + 0.8}">
+      `<section class="section${s.pale ? " pale" : ""}" style="--section:${s.color}; --section-bg:${s.bg}; --section-fg:${s.fg}; --grow:${Math.ceil(taps.length / 2) + 0.8}">
          <h2>${esc(s.title)}</h2>
          <div class="list">${items}</div>
        </section>`);
@@ -316,7 +327,7 @@ function fit() {
 }
 
 // Настройки вида
-const DEFAULTS = { num: "dept", img: "tile", rg: "fill", tags: "photo", theme: "dark" };
+const DEFAULTS = { num: "dept", img: "tile", rg: "fill", tags: "photo", hdr: "brand", theme: "dark" };
 let settings = { ...DEFAULTS };
 try { Object.assign(settings, JSON.parse(localStorage.getItem("taplist-settings") || "{}")); } catch (e) {}
 if (!["photo", "num"].includes(settings.tags)) settings.tags = DEFAULTS.tags;
@@ -328,6 +339,7 @@ function apply() {
     settings.rg === "off" ? "" : "rg-on rg-" + settings.rg,
     "tags-" + settings.tags,
     settings.theme === "light" ? "light" : "",
+    settings.hdr === "bar" ? "hdr-bar" : "",
   ].join(" ");
   render(settings.num);
   fit();
