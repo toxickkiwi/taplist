@@ -13,19 +13,21 @@
   :root {
     /* палитра Robim Good: кремовый, Black 6 C, оранжевые 2028/165/144, жёлтый 130 */
     --rg-cream: #f7f2e8; --rg-black: #101820; --rg-red: #C63418; --rg-orange: #EC6608; --rg-amber: #F39000; --rg-yellow: #FAB600;
-    --bg: #17191c; --panel: #222428; --fg: #f7f2e8; --muted: #a9a59c; --line: rgba(255,255,255,.08);
-    --price: var(--rg-yellow); --brewery: #c9c3b8;
-    --rg: var(--rg-orange);
-    --zero: #38bdf8;
-    --t-new: #3fae5a; --t-sale: var(--rg-red); --t-promo: var(--rg-yellow); --t-top: var(--rg-cream);
+    /* на экране — приглушённые «благородные» версии: золото, медь, гранат */
+    --gold: #d9b45f; --copper: #c9773f; --garnet: #a8473a;
+    --bg: #131416; --panel: #1c1e21; --fg: #f3ede2; --muted: #a39e94; --line: rgba(255,255,255,.08);
+    --price: var(--gold); --brewery: #bdb6aa;
+    --rg: var(--copper);
+    --zero: #7fb6cf;
+    --t-new: #5b9a6e; --t-sale: var(--garnet); --t-promo: var(--gold); --t-top: #e9e1d2;
   }
   .light {
     --bg: #e9e3d6; --panel: var(--rg-cream); --fg: var(--rg-black); --muted: #5f5a52; --line: rgba(0,0,0,.08);
-    --price: var(--rg-red); --brewery: #5f5a52;
+    --price: #9a4a2a; --brewery: #5f5a52;
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; overflow: hidden; background: #17191c; color-scheme: dark; }
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #131416; color-scheme: dark; }
   html { font-size: 10px; }
   body { font-family: Arial, Helvetica, sans-serif; }
 
@@ -39,17 +41,18 @@
   .lanes { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: .6rem; }
   .lane { min-height: 0; display: flex; flex-direction: column; gap: .6rem; }
 
-  /* ---------- секции: яркая шапка цвета сорта ---------- */
+  /* ---------- секции: тёмная шапка, название цветом сорта, линия снизу ---------- */
   .section { flex: var(--grow) 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--panel); border-radius: .6rem; }
   .section h2 {
     flex: none; margin: 0; padding: .7rem 1.6rem;
-    background: var(--section-bg); color: var(--section-fg); border-bottom: .3rem solid var(--section);
+    background: color-mix(in srgb, var(--section) 16%, var(--panel)); color: var(--section); border-bottom: .3rem solid var(--section);
     text-align: center; text-transform: uppercase; letter-spacing: .04em; line-height: 1.1;
     font-family: "Fira Sans", "Arial Black", Arial, sans-serif; font-size: 2.8rem; font-weight: 800;
   }
-  /* шапки «как бар»: все жёлтые с графитовым текстом */
-  .hdr-bar .section h2 { background: var(--rg-yellow); color: var(--rg-black); border-bottom-color: var(--rg-yellow); }
-  .hdr-bar .num b { color: var(--rg-yellow); }
+  /* шапки «как бар»: все золотые с графитовым текстом */
+  .hdr-bar .section h2 { background: var(--gold); color: var(--rg-black); border-bottom-color: var(--gold); }
+  .hdr-bar .num b { color: var(--gold); }
+  .light .section h2 { background: var(--section); color: var(--rg-black); }
   .light.hdr-bar .num b, .light .pale .num b { color: var(--rg-black); }
   .list { flex: 1 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: space-evenly; gap: .8rem 1.6rem; padding: 1rem 1.2rem; }
 
@@ -89,18 +92,18 @@
   .stats .abv { color: var(--fg); font-weight: 800; font-size: 1.35rem; }
 
   .prices { display: grid; grid-template-columns: auto auto; gap: .2rem .7rem; align-items: baseline; white-space: nowrap; }
-  .prices span { font-size: 1.3rem; color: var(--muted); text-align: right; }
+  .prices span { font: 600 1.8rem/1 "Fira Sans", Arial, sans-serif; color: var(--fg); text-align: right; }
   .prices strong { font-size: 2.4rem; font-weight: 900; color: var(--price); font-family: Montserrat, Arial, sans-serif; font-variant-numeric: tabular-nums; }
   .prices small { font-size: .6em; margin-left: .15em; }
 
   /* ---------- Robim Good и нулёвки ---------- */
-  .rg-mark { display: none; margin-right: .5rem; padding: .1rem .45rem; border-radius: .4rem; background: var(--rg); color: #1f0d00; font: 900 1.2rem/1.3 Montserrat, Arial, sans-serif; vertical-align: .35rem; }
+  .rg-mark { display: none; margin-right: .5rem; padding: .1rem .45rem; border-radius: .4rem; background: var(--rg); color: #1c0d02; font: 900 1.2rem/1.3 Montserrat, Arial, sans-serif; vertical-align: .35rem; }
   .rg-on .tap.rg .rg-mark { display: inline-block; }
   .rg-on .tap.rg .brewery { color: var(--rg); }
   .rg-frame .tap.rg { border-color: var(--rg); }
-  .rg-fill .tap.rg { background: color-mix(in srgb, var(--rg) 16%, transparent); }
+  .rg-fill .tap.rg { background: color-mix(in srgb, var(--rg) 13%, transparent); }
   .rg-on .tap.zero { --rg: var(--zero); }
-  .rg-on .tap.zero .rg-mark { background: var(--zero); color: #04263a; }
+  .rg-on .tap.zero .rg-mark { background: var(--zero); color: #0b2430; }
 
   /* ---------- метки ---------- */
   .tag { display: inline-flex; align-items: center; gap: .3rem; border-radius: .5rem; padding: .25rem .7rem; font: 900 1.35rem/1.1 Montserrat, Arial, sans-serif; text-transform: uppercase; letter-spacing: .03em; white-space: nowrap; background: var(--tc); color: var(--tfg, #fff); }
@@ -190,14 +193,14 @@
 </form>
 
 <script>
-// Цвета шапок из палитры Robim Good.
+// Цвета шапок: приглушённые тона палитры Robim Good (золото, бронза, шампань, медь, гранат, глина).
 const SECTIONS = [
-  { id: "light",      title: "Светлое фильтрованное",   color: "#FAB600", bg: "#FAB600", fg: "#101820", lane: 0 },
-  { id: "wheat",      title: "Пшеничное",               color: "#f7f2e8", bg: "#f7f2e8", fg: "#101820", lane: 0, pale: true },
-  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#EC6608", bg: "#EC6608", fg: "#f7f2e8", lane: 0 },
-  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#F39000", bg: "#F39000", fg: "#101820", lane: 1 },
-  { id: "dark",       title: "Тёмное",                  color: "#C63418", bg: "#C63418", fg: "#f7f2e8", lane: 1 },
-  { id: "other",      title: "Не пиво",                 color: "#E74919", bg: "#E74919", fg: "#f7f2e8", lane: 1 },
+  { id: "light",      title: "Светлое фильтрованное",   color: "#d9b45f", lane: 0 },
+  { id: "wheat",      title: "Пшеничное",               color: "#e6d6b4", lane: 0, pale: true },
+  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#c9773f", lane: 0 },
+  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#b9905a", lane: 1 },
+  { id: "dark",       title: "Тёмное",                  color: "#a8473a", lane: 1 },
+  { id: "other",      title: "Не пиво",                 color: "#c48a7a", lane: 1 },
 ];
 
 // Метки, которые есть в админке: Zero, New, %, 1.5=2, Top.
@@ -309,7 +312,7 @@ function render(numbering) {
     const taps = TAPS.filter(t => t[0] === s.id);
     const items = taps.map((t, i) => tapHtml(t, numbering === "all" ? ++total : i + 1)).join("");
     lanes[s.lane].insertAdjacentHTML("beforeend",
-      `<section class="section${s.pale ? " pale" : ""}" style="--section:${s.color}; --section-bg:${s.bg}; --section-fg:${s.fg}; --grow:${Math.ceil(taps.length / 2) + 0.8}">
+      `<section class="section${s.pale ? " pale" : ""}" style="--section:${s.color}; --grow:${Math.ceil(taps.length / 2) + 0.8}">
          <h2>${esc(s.title)}</h2>
          <div class="list">${items}</div>
        </section>`);
