@@ -110,11 +110,13 @@
   .tag.zero  { --tc: var(--zero); --tfg: #04263a; }
   /* Метки никогда не перекрывают картинку: под фото или под номером. */
   .num .tag, .photo-tag { display: none; }
-  .tags-photo .photo-tag { display: flex; justify-content: center; margin-top: .4rem; }
+  /* под фото: метка наезжает на нижний край картинки на половину своей высоты */
+  .tags-photo .photo-tag { display: flex; justify-content: center; position: absolute; left: -1rem; right: -1rem; top: 6.4rem; transform: translateY(-50%); }
+  .tags-photo .media { margin-bottom: 1rem; }
   .tags-num .num .tag, .img-none .num .tag { display: inline-flex; }
   .img-none .photo-tag { display: none; }
   .num .tag { margin-top: .4rem; }
-  .photo-tag .tag, .num .tag { font-size: 1.15rem; padding: .2rem .5rem; }
+  .photo-tag .tag, .num .tag { font-size: 1.5rem; padding: .3rem .7rem; box-shadow: 0 .2rem .5rem rgba(0,0,0,.45); }
 
   /* ---------- панель настроек (на ТВ прячется сама) ---------- */
   .gear {
