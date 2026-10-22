@@ -45,7 +45,7 @@
   .section { flex: var(--grow) 1 0; min-height: 0; overflow: hidden; display: flex; flex-direction: column; background: var(--panel); border-radius: .6rem; }
   .section h2 {
     flex: none; margin: 0; padding: .7rem 1.6rem;
-    background: color-mix(in srgb, var(--section) 16%, var(--panel)); color: var(--section); border-bottom: .3rem solid var(--section);
+    background: color-mix(in srgb, var(--section) 22%, var(--panel)); color: var(--section); border-bottom: .3rem solid var(--section);
     text-align: center; text-transform: uppercase; letter-spacing: .04em; line-height: 1.1;
     font-family: "Fira Sans", "Arial Black", Arial, sans-serif; font-size: 2.8rem; font-weight: 800;
   }
@@ -195,12 +195,12 @@
 <script>
 // Цвета шапок: приглушённые тона палитры Robim Good (золото, бронза, шампань, медь, гранат, глина).
 const SECTIONS = [
-  { id: "light",      title: "Светлое фильтрованное",   color: "#d9b45f", lane: 0 },
-  { id: "wheat",      title: "Пшеничное",               color: "#e6d6b4", lane: 0, pale: true },
-  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#c9773f", lane: 0 },
-  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#b9905a", lane: 1 },
-  { id: "dark",       title: "Тёмное",                  color: "#a8473a", lane: 1 },
-  { id: "other",      title: "Не пиво",                 color: "#c48a7a", lane: 1 },
+  { id: "light",      title: "Светлое фильтрованное",   color: "#e6bb52", lane: 0 },
+  { id: "wheat",      title: "Пшеничное",               color: "#efdcab", lane: 0, pale: true },
+  { id: "craft",      title: "IPA, SOUR, GOSE",         color: "#db7a38", lane: 0 },
+  { id: "unfiltered", title: "Светлое нефильтрованное", color: "#cc9a52", lane: 1 },
+  { id: "dark",       title: "Тёмное",                  color: "#c04a38", lane: 1 },
+  { id: "other",      title: "Не пиво",                 color: "#d68c74", lane: 1 },
 ];
 
 // Метки, которые есть в админке: Zero, New, %, 1.5=2, Top.
