@@ -122,6 +122,24 @@
   .num .tag { margin-top: .4rem; }
   .photo-tag .tag, .num .tag { font-size: 1.5rem; padding: .3rem .7rem; box-shadow: 0 .2rem .5rem rgba(0,0,0,.45); }
 
+
+  /* Фигура цвета метки за логотипом: звезда-бёрст, ромб или круг */
+  .tap.t-new   { --tc: var(--t-new); }
+  .tap.t-sale  { --tc: var(--t-sale); }
+  .tap.t-promo { --tc: var(--t-promo); }
+  .tap.t-top   { --tc: var(--t-top); }
+  .tap.t-zero  { --tc: var(--zero); }
+  .media img, .media .glass { position: relative; z-index: 1; }
+  .photo-tag { z-index: 2; }
+  .tap[class*=" t-"] .media::before { content: ""; position: absolute; z-index: 0; left: 50%; top: 3.2rem; translate: -50% -50%; background: var(--tc); display: none; }
+  .shape-burst .tap[class*=" t-"] .media::before { display: block; width: 9.4rem; height: 9.4rem; clip-path: polygon(50.0% 0.0%, 58.9% 11.0%, 71.7% 5.0%, 74.9% 18.7%, 89.1% 18.8%, 86.0% 32.6%, 98.7% 38.9%, 90.0% 50.0%, 98.7% 61.1%, 86.0% 67.4%, 89.1% 81.2%, 74.9% 81.3%, 71.7% 95.0%, 58.9% 89.0%, 50.0% 100.0%, 41.1% 89.0%, 28.3% 95.0%, 25.1% 81.3%, 10.9% 81.2%, 14.0% 67.4%, 1.3% 61.1%, 10.0% 50.0%, 1.3% 38.9%, 14.0% 32.6%, 10.9% 18.8%, 25.1% 18.7%, 28.3% 5.0%, 41.1% 11.0%); animation: spin 24s linear infinite; }
+  .shape-diamond .tap[class*=" t-"] .media::before { display: block; width: 8.2rem; height: 8.2rem; clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+  .shape-circle .tap[class*=" t-"] .media::before { display: block; width: 8.4rem; height: 8.4rem; border-radius: 50%; }
+  /* место под фигуру, чтобы она не заходила на номер и название */
+  .shape-burst .media, .shape-diamond .media, .shape-circle .media { margin-inline: 1rem; }
+  @keyframes spin { to { rotate: 360deg; } }
+  @media (prefers-reduced-motion: reduce) { .shape-burst .tap[class*=" t-"] .media::before { animation: none; } }
+
   /* ---------- панель настроек (на ТВ прячется сама) ---------- */
   .gear {
     position: fixed; right: max(1rem, env(safe-area-inset-right, 0px)); bottom: max(1rem, env(safe-area-inset-bottom, 0px)); z-index: 20;
@@ -188,6 +206,13 @@
   <div class="opts" data-key="hdr">
     <label><input type="radio" name="hdr" value="brand"><span>Цвета Robim Good</span></label>
     <label><input type="radio" name="hdr" value="bar"><span>Жёлтые, как бар</span></label>
+  </div>
+  <h4>Фигура за фото с меткой</h4>
+  <div class="opts" data-key="shape">
+    <label><input type="radio" name="shape" value="burst"><span>Звезда</span></label>
+    <label><input type="radio" name="shape" value="diamond"><span>Ромб</span></label>
+    <label><input type="radio" name="shape" value="circle"><span>Круг</span></label>
+    <label><input type="radio" name="shape" value="none"><span>Без фигуры</span></label>
   </div>
   <h4>Фон</h4>
   <div class="opts" data-key="theme">
@@ -287,7 +312,7 @@ function tapHtml(t, num) {
   const tagKey = tag || (isZero ? "ZERO" : null);
   const tagDef = tagKey && TAGS[tagKey];
   const tagHtml = tagDef ? `<span class="tag ${tagDef.cls}">${esc(tagDef.short)}</span>` : "";
-  return `<article class="tap${isRg ? " rg" : ""}${isZero ? " zero" : ""}">
+  return `<article class="tap${isRg ? " rg" : ""}${isZero ? " zero" : ""}${tagDef ? " t-" + tagDef.cls : ""}">
     <div class="num"><b>${num}</b>${tagHtml}</div>
     <div class="media">
       <img src="https://assets.untappd.com/site/beer_logos/${img}.jpeg" alt="" loading="lazy">
@@ -352,7 +377,7 @@ function fit() {
 }
 
 // Настройки вида
-const DEFAULTS = { order: "zero-rgb", num: "dept", img: "tile", rg: "fill", tags: "photo", hdr: "brand", theme: "dark" };
+const DEFAULTS = { order: "zero-rgb", num: "dept", img: "tile", rg: "fill", tags: "photo", shape: "burst", hdr: "brand", theme: "dark" };
 let settings = { ...DEFAULTS };
 try { Object.assign(settings, JSON.parse(localStorage.getItem("taplist-settings") || "{}")); } catch (e) {}
 if (!["photo", "num"].includes(settings.tags)) settings.tags = DEFAULTS.tags;
@@ -363,6 +388,7 @@ function apply() {
     "img-" + settings.img,
     settings.rg === "off" ? "" : "rg-on rg-" + settings.rg,
     "tags-" + settings.tags,
+    "shape-" + settings.shape,
     settings.theme === "light" ? "light" : "",
     settings.hdr === "bar" ? "hdr-bar" : "",
   ].join(" ");
