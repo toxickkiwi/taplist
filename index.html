@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Taplist</title>
+<title>Варианты таплиста</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;600;800&family=Caveat:wght@600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <style>
@@ -13,14 +14,17 @@
   }
 
   * { box-sizing: border-box; }
-  html, body { margin: 0; }
-  body { font-family: Inter, system-ui, sans-serif; min-height: 100vh; }
+  html, body { margin: 0; background: #141414; color-scheme: dark; }
+  body { font-family: Inter, system-ui, sans-serif; }
+  #app { min-height: 100vh; }
 
   /* ---------- переключатель вариантов ---------- */
   .switcher {
-    position: sticky; top: 0; z-index: 10;
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
     display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
-    padding: 10px 16px;
+    padding-block: 10px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
     background: #111; color: #eee; font-size: 14px;
     border-bottom: 1px solid #333;
   }
@@ -34,7 +38,7 @@
   .switcher label { margin-left: auto; display: flex; gap: 6px; align-items: center; }
 
   /* ---------- общая раскладка ---------- */
-  .board { padding: 24px; }
+  .board { padding-block: 24px; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
   .lanes { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: start; }
   .lane { display: flex; flex-direction: column; gap: 24px; }
   .section h2 { margin: 0 0 12px; }
@@ -52,7 +56,7 @@
 
   @media (max-width: 1100px) { .lanes { grid-template-columns: 1fr; } }
   @media (max-width: 640px) {
-    .board { padding: 16px; }
+    .board { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
     .list { grid-template-columns: 1fr; }
   }
 
@@ -97,7 +101,8 @@
   .v-cards .badge { left: auto; right: 10px; top: -8px; bottom: auto; background: #ff3d6e; color: #fff; }
 </style>
 </head>
-<body class="v-original">
+<body>
+<div id="app" class="v-original">
 
 <div class="switcher" role="toolbar" aria-label="Вариант дизайна">
   <b>Вариант:</b>
@@ -199,7 +204,7 @@ for (const s of SECTIONS) {
 // Переключатель вариантов
 const buttons = document.querySelectorAll(".switcher button");
 function setVariant(v) {
-  document.body.className = v;
+  document.getElementById("app").className = v;
   buttons.forEach(b => b.setAttribute("aria-pressed", b.dataset.v === v));
   try { localStorage.setItem("taplist-variant", v); } catch (e) {}
 }
@@ -211,5 +216,6 @@ setVariant(saved || "v-original");
 document.getElementById("perRow").addEventListener("change", e =>
   document.documentElement.style.setProperty("--per-row", e.target.value));
 </script>
+</div>
 </body>
 </html>
