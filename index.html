@@ -12,14 +12,14 @@
      а размер rem подбирает скрипт в конце страницы. */
   :root {
     --bg: #121110; --panel: #1c1a18; --fg: #fff; --muted: #b9b2a7; --line: rgba(255,255,255,.08);
-    --price: #ffd23f; --brewery: #f0953a;
-    --rg: #22c3b0;      /* фирменный цвет Robim Good — заменить на настоящий */
+    --price: #ffd23f; --brewery: #c9c1b5;
+    --rg: #ff7a00;      /* фирменный цвет Robim Good */
     --zero: #38bdf8;
     --t-new: #22c55e; --t-sale: #ef4444; --t-promo: #facc15; --t-top: #a855f7;
   }
   .light {
     --bg: #ece7dd; --panel: #fffdf9; --fg: #17130f; --muted: #5f564b; --line: rgba(0,0,0,.08);
-    --price: #b45309; --brewery: #c2410c;
+    --price: #b45309; --brewery: #6b6157;
   }
 
   * { box-sizing: border-box; }
@@ -69,9 +69,8 @@
   .img-glass .media img { display: none; }
   .img-glass .media .glass { display: block; }
   /* 4) без картинок */
-  .img-none .media { display: none; }
-  .img-none .tap { grid-template-columns: auto minmax(0, 1fr) auto; }
-  .no-num.img-none .tap { grid-template-columns: minmax(0, 1fr) auto; }
+  .img-none .tap { grid-template-columns: auto 0 minmax(0, 1fr) auto; }
+  .no-num.img-none .tap { grid-template-columns: auto minmax(0, 1fr) auto; }
   .no-num:not(.img-none) .tap { grid-template-columns: auto minmax(0, 1fr) auto; }
 
   .info { min-width: 0; }
@@ -88,7 +87,7 @@
   .prices small { font-size: .6em; margin-left: .15em; }
 
   /* ---------- Robim Good и нулёвки ---------- */
-  .rg-mark { display: none; margin-right: .5rem; padding: .1rem .45rem; border-radius: .4rem; background: var(--rg); color: #062a26; font: 900 1.2rem/1.3 Montserrat, Arial, sans-serif; vertical-align: .35rem; }
+  .rg-mark { display: none; margin-right: .5rem; padding: .1rem .45rem; border-radius: .4rem; background: var(--rg); color: #1f0d00; font: 900 1.2rem/1.3 Montserrat, Arial, sans-serif; vertical-align: .35rem; }
   .rg-on .tap.rg .rg-mark { display: inline-block; }
   .rg-on .tap.rg .brewery { color: var(--rg); }
   .rg-frame .tap.rg { border-color: var(--rg); }
@@ -103,19 +102,23 @@
   .tag.promo { --tc: var(--t-promo); --tfg: #1a1300; }
   .tag.top   { --tc: var(--t-top); }
   .tag.zero  { --tc: var(--zero); --tfg: #04263a; }
-  .tags { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .4rem; }
-  .ribbon { display: none; }
+  /* метки на фото; без картинок — у номера */
+  .ribbon { position: absolute; inset: 0; pointer-events: none; }
 
   /* вариант «ленточка»: наискосок через угол картинки */
-  .tags-ribbon .tags { display: none; }
-  .tags-ribbon .ribbon { display: block; position: absolute; inset: 0; overflow: hidden; border-radius: .6rem; pointer-events: none; }
+  .tags-ribbon .ribbon { overflow: hidden; border-radius: .6rem; }
   .tags-ribbon .ribbon .tag { position: absolute; top: 1.2rem; left: -2.8rem; width: 11rem; justify-content: center; transform: rotate(-45deg); border-radius: 0; padding: .25rem 0; font-size: 1.3rem; box-shadow: 0 .2rem .5rem rgba(0,0,0,.4); }
-  .tags-ribbon.img-none .tags { display: flex; }
 
-  /* вариант «как сейчас»: мелкая жёлтая плашка под картинкой (для сравнения) */
-  .tags-old .tags { display: none; }
-  .tags-old .ribbon { display: block; position: absolute; left: 0; right: 0; bottom: -.5rem; text-align: center; }
-  .tags-old .ribbon .tag { background: #e8a317; color: #111; font: 800 1rem/1.2 Arial, sans-serif; padding: .05rem .5rem; border-radius: 99px; text-transform: none; }
+  /* вариант «наклейка»: плашка внизу фото, чуть выходит за край */
+  .tags-sticker .ribbon .tag { position: absolute; left: 50%; bottom: -.7rem; transform: translateX(-50%); font-size: 1.2rem; padding: .2rem .55rem; box-shadow: 0 .2rem .5rem rgba(0,0,0,.45); }
+
+  /* без картинок метка садится под номер */
+  .img-none .media { display: block; width: 0; height: auto; align-self: stretch; }
+  .img-none .media img, .img-none .media .glass { display: none; }
+  .img-none .ribbon { inset: auto auto 0 -4.6rem; overflow: visible; }
+  .no-num.img-none .media { width: auto; align-self: center; }
+  .no-num.img-none .ribbon { position: static; }
+  .img-none .ribbon .tag { position: static; transform: none; width: auto; font-size: 1rem; padding: .15rem .4rem; border-radius: .4rem; }
 
   /* ---------- панель настроек (на ТВ прячется сама) ---------- */
   .gear {
@@ -171,9 +174,8 @@
   </div>
   <h4>Метки</h4>
   <div class="opts" data-key="tags">
-    <label><input type="radio" name="tags" value="pill"><span>Плашка над названием</span></label>
-    <label><input type="radio" name="tags" value="ribbon"><span>Ленточка на картинке</span></label>
-    <label><input type="radio" name="tags" value="old"><span>Как сейчас</span></label>
+    <label><input type="radio" name="tags" value="ribbon"><span>Ленточка в углу фото</span></label>
+    <label><input type="radio" name="tags" value="sticker"><span>Наклейка внизу фото</span></label>
   </div>
   <h4>Фон</h4>
   <div class="opts" data-key="theme">
@@ -268,9 +270,7 @@ function tapHtml(t, num) {
   const isZero = abv === 0;
   const tagKey = tag || (isZero ? "ZERO" : null);
   const tagDef = tagKey && TAGS[tagKey];
-  const tagHtml = tagDef ? `<span class="tag ${tagDef.cls}">${esc(tagDef.text)}</span>` : "";
   const ribbonHtml = tagDef ? `<div class="ribbon"><span class="tag ${tagDef.cls}">${esc(tagDef.short)}</span></div>` : "";
-  const shortName = isRg ? name.replace(/^Robim Good\s+/i, "") : name;
   return `<article class="tap${isRg ? " rg" : ""}${isZero ? " zero" : ""}">
     <div class="num">${num}</div>
     <div class="media">
@@ -279,8 +279,7 @@ function tapHtml(t, num) {
       ${ribbonHtml}
     </div>
     <div class="info">
-      ${tagHtml ? `<div class="tags">${tagHtml}</div>` : ""}
-      <h3>${isRg ? `<span class="rg-mark">RG</span>` : ""}<span class="full-name">${esc(name)}</span><span class="short-name" hidden>${esc(shortName)}</span></h3>
+      <h3>${isRg ? `<span class="rg-mark">RGB</span>` : ""}${esc(name)}</h3>
       <p class="brewery">${flag(cc)} ${esc(brewery)}</p>
       <div class="stats">
         <span class="abv">${abv}%</span>
@@ -327,9 +326,10 @@ function fit() {
 }
 
 // Настройки вида
-const DEFAULTS = { num: "dept", img: "tile", rg: "fill", tags: "pill", theme: "dark" };
+const DEFAULTS = { num: "dept", img: "tile", rg: "fill", tags: "ribbon", theme: "dark" };
 let settings = { ...DEFAULTS };
 try { Object.assign(settings, JSON.parse(localStorage.getItem("taplist-settings") || "{}")); } catch (e) {}
+if (!["ribbon", "sticker"].includes(settings.tags)) settings.tags = DEFAULTS.tags;
 
 function apply() {
   app.className = [
@@ -340,11 +340,6 @@ function apply() {
     settings.theme === "light" ? "light" : "",
   ].join(" ");
   render(settings.num);
-  document.querySelectorAll(".tap.rg").forEach(el => {
-    const on = settings.rg !== "off";
-    el.querySelector(".full-name").hidden = on;
-    el.querySelector(".short-name").hidden = !on;
-  });
   fit();
 }
 
