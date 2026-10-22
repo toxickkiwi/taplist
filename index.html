@@ -6,7 +6,7 @@
 <title>Таплист</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Fira+Sans:wght@600;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Fira+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   /* Экран бара: всё помещается строго в одно окно. Размеры в rem,
      а размер rem подбирает скрипт в конце страницы. */
@@ -15,14 +15,14 @@
     --rg-cream: #f7f2e8; --rg-black: #101820; --rg-red: #C63418; --rg-orange: #EC6608; --rg-amber: #F39000; --rg-yellow: #FAB600;
     /* на экране — приглушённые «благородные» версии: золото, медь, гранат */
     --gold: #d9b45f; --copper: #c9773f; --garnet: #a8473a;
-    --bg: #131416; --panel: #1c1e21; --fg: #f3ede2; --muted: #a39e94; --line: rgba(255,255,255,.08);
+    --bg: #131416; --panel: #1c1e21; --fg: #f3ede2; --muted: #a39e94; --stats: #d4cdc0; --line: rgba(255,255,255,.08);
     --price: var(--gold); --brewery: #bdb6aa;
     --rg: var(--copper);
     --zero: #7fb6cf;
     --t-new: #5b9a6e; --t-sale: var(--garnet); --t-promo: var(--gold); --t-top: #e9e1d2;
   }
   .light {
-    --bg: #e9e3d6; --panel: var(--rg-cream); --fg: var(--rg-black); --muted: #5f5a52; --line: rgba(0,0,0,.08);
+    --bg: #e9e3d6; --panel: var(--rg-cream); --fg: var(--rg-black); --muted: #5f5a52; --stats: #3d3830; --line: rgba(0,0,0,.08);
     --price: #9a4a2a; --brewery: #5f5a52;
   }
 
@@ -85,11 +85,11 @@
   .info { min-width: 0; }
   /* название — главное на экране: крупный Fira Sans, без сжатия */
   .tap h3 { margin: 0; font-family: "Fira Sans", Arial, sans-serif; font-size: 2.6rem; font-weight: 600; letter-spacing: .01em; line-height: 1.08; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .brewery { margin: .3rem 0 .4rem; color: var(--brewery); font-size: 1.15rem; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .stats { display: flex; flex-wrap: wrap; align-items: baseline; font-size: 1.15rem; color: var(--muted); }
+  .brewery { margin: .3rem 0 .4rem; color: var(--brewery); font: 700 1.4rem/1.15 "Fira Sans", Arial, sans-serif; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .stats { display: flex; flex-wrap: wrap; align-items: baseline; font: 500 1.6rem/1.2 "Fira Sans", Arial, sans-serif; color: var(--stats); }
   .stats span { white-space: nowrap; }
   .stats span + span::before { content: "·"; margin: 0 .5rem; }
-  .stats .abv { color: var(--fg); font-weight: 800; font-size: 1.35rem; }
+  .stats .abv { color: var(--fg); font-weight: 700; }
 
   .prices { display: grid; grid-template-columns: auto auto; gap: .2rem .7rem; align-items: baseline; white-space: nowrap; }
   .prices span { font: 600 1.8rem/1 "Fira Sans", Arial, sans-serif; color: var(--fg); text-align: right; }
